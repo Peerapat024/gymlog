@@ -3,16 +3,17 @@ import { A } from '../../constants/theme';
 import { haptic } from '../../utils/haptics';
 
 interface RestTimerProps {
-  duration: number;
+  endTime: number;
   onDone: () => void;
   isPR?: boolean;
   nextLabel?: string;
 }
 
-export default function RestTimer({ duration, onDone, isPR, nextLabel }: RestTimerProps) {
-  const endAtRef = useRef(Date.now() + duration * 1000);
-  const [rem, setRem] = useState(duration);
-  const [total, setTotal] = useState(duration);
+export default function RestTimer({ endTime, onDone, isPR, nextLabel }: RestTimerProps) {
+  const endAtRef = useRef(endTime);
+  const initialRem = Math.max(1, Math.round((endTime - Date.now()) / 1000));
+  const [rem, setRem] = useState(initialRem);
+  const [total, setTotal] = useState(initialRem);
   const [bumped, setBumped] = useState(false);
 
   useEffect(() => {

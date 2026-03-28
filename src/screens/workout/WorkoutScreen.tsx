@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { A, D, B, M } from '../../constants/theme';
 import { DB } from '../../utils/db';
 import { haptic } from '../../utils/haptics';
@@ -219,14 +219,15 @@ function TemplateExerciseScreen({ template, sessionSets, onSelect, onSwitchMuscl
 }
 
 /* ─── SetLogger ───────────────────────────────────────────────────────────── */
-function SetLogger({ exercise, bodyPartId, setNumber, sessionSets, onLogSet, onChangeExercise, onSwitchMuscle }: {
+function SetLogger({ exercise, bodyPartId, setNumber, sessionSets, onLogSet, onChangeExercise, onSwitchMuscle, restDuration }: {
   exercise: string;
   bodyPartId: string;
   setNumber: number;
   sessionSets: LoggedSet[];
-  onLogSet: (set: LoggedSet, andNext: boolean | 'end') => void;
+  onLogSet: (set: LoggedSet, andNext: boolean | 'end', restEndsAt?: number) => void;
   onChangeExercise: () => void;
   onSwitchMuscle: () => void;
+  restDuration: number;
 }) {
   const prev = sessionSets.filter(s => s.exercise === exercise).slice(-1)[0];
   const histLast = getHistory(exercise, 1)[0]?.sets?.slice(-1)[0];
@@ -255,6 +256,9 @@ function SetLogger({ exercise, bodyPartId, setNumber, sessionSets, onLogSet, onC
   const [noteOpen, setNoteOpen] = useState(false);
   const [showActions, setShowActions] = useState(false);
   const [savedSet, setSavedSet] = useState<LoggedSet | null>(null);
+  const [summaryRestEndsAt, setSummaryRestEndsAt] = useState<number | null>(null);
+  const [summaryRem, setSummaryRem] = useState(0);
+  const autoAdvanced = useRef(false);
 
   const toggleUnit = () => {
     haptic.light();
@@ -279,6 +283,22 @@ function SetLogger({ exercise, bodyPartId, setNumber, sessionSets, onLogSet, onC
   const isNewPR = weightKg() > pr && pr > 0;
   const done = sessionSets.filter(s => s.exercise === exercise);
 
+  useEffect(() => {
+    if (!showActions || !summaryRestEndsAt) return;
+    autoAdvanced.current = false;
+    const id = setInterval(() => {
+      const r = Math.max(0, Math.floor((summaryRestEndsAt - Date.now()) / 1000));
+      setSummaryRem(r);
+      if (r <= 0 && !autoAdvanced.current) {
+        autoAdvanced.current = true;
+        clearInterval(id);
+        haptic.medium();
+        onLogSet(savedSet!, false, summaryRestEndsAt);
+      }
+    }, 250);
+    return () => clearInterval(id);
+  }, [showActions, summaryRestEndsAt]);
+
   const handleWeight = (v: string) => { if (v === '' || /^\d*\.?\d*$/.test(v)) setWeight(v); };
   const canSave = bwMode ? parseInt(reps) > 0 : !!(parseFloat(weight) > 0 && parseInt(reps) > 0);
   const step = unit === 'lbs' ? 5 : 2.5;
@@ -292,6 +312,8 @@ function SetLogger({ exercise, bodyPartId, setNumber, sessionSets, onLogSet, onC
     isPR ? haptic.pr() : haptic.success();
     const set: LoggedSet = { exercise, bodyPart: bodyPartId, weight: wkg, reps: r, setNumber, isPR, note: note.trim() || undefined, unit: unit as 'kg' | 'lbs', bwMode: bwMode || undefined, bwSign: bwMode ? (bwSign as '+' | '-') : undefined, addedKg: bwMode ? addedKg : undefined, _ts: Date.now() };
     setSavedSet(set);
+    setSummaryRestEndsAt(Date.now() + restDuration * 1000);
+    setSummaryRem(restDuration);
     setShowActions(true);
   };
 
@@ -317,12 +339,27 @@ function SetLogger({ exercise, bodyPartId, setNumber, sessionSets, onLogSet, onC
           </div>
           {savedSet.note && <div style={{ marginTop: 12, fontSize: 13, color: '#777', fontStyle: 'italic' }}>"{savedSet.note}"</div>}
         </div>
-        <div style={{ padding: '12px 24px 0', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <div style={{ fontSize: 10, color: '#555', letterSpacing: '0.2em', fontWeight: 700, textAlign: 'center', marginBottom: 2, animation: 'fadeIn 0.18s ease-out both' }}>WHAT NEXT?</div>
-          <button onClick={() => { haptic.medium(); onLogSet(savedSet, false); }} style={{ width: '100%', padding: '22px 0', background: A, border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 800, letterSpacing: '0.08em', cursor: 'pointer', color: '#000', animation: 'slideUp 0.18s ease-out 0.05s both' }}>NEXT SET</button>
-          <button onClick={() => { haptic.light(); onLogSet(savedSet, true); }} style={{ width: '100%', padding: '19px 0', background: '#1e1e1e', border: '0.5px solid #444', borderRadius: 12, fontSize: 14, fontWeight: 700, letterSpacing: '0.08em', cursor: 'pointer', color: '#fff', animation: 'slideUp 0.18s ease-out 0.1s both' }}>NEXT EXERCISE</button>
-          <button onClick={() => { haptic.light(); onLogSet(savedSet, 'end'); }} style={{ width: '100%', padding: '16px 0', background: 'transparent', border: '0.5px solid #333', borderRadius: 12, fontSize: 12, fontWeight: 700, letterSpacing: '0.12em', cursor: 'pointer', color: '#666', animation: 'slideUp 0.18s ease-out 0.15s both' }}>END SESSION</button>
-          <button disabled style={{ width: '100%', padding: '22px 0', background: '#080808', border: 'none', cursor: 'default', display: 'block' }} />
+        <div style={{ padding: '0 24px', flexShrink: 0 }}>
+          {summaryRestEndsAt && (
+            <div style={{ marginBottom: 16, animation: 'fadeIn 0.2s ease-out both' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                <span style={{ fontSize: 10, color: '#555', letterSpacing: '0.2em', fontWeight: 700 }}>REST</span>
+                <span style={{ fontSize: summaryRem > 0 ? 28 : 14, fontWeight: 900, color: summaryRem > 0 ? (summaryRem <= 10 ? '#ff4040' : A) : '#555', letterSpacing: '-0.02em', transition: 'color 0.3s', fontVariantNumeric: 'tabular-nums' }}>
+                  {summaryRem > 0 ? (summaryRem >= 60 ? Math.floor(summaryRem / 60) + ':' + String(summaryRem % 60).padStart(2, '0') : summaryRem + 's') : 'GO →'}
+                </span>
+              </div>
+              <div style={{ height: 3, background: '#111', borderRadius: 2, overflow: 'hidden' }}>
+                <div style={{ height: '100%', background: summaryRem <= 10 ? '#ff4040' : A, borderRadius: 2, width: `${(summaryRem / restDuration) * 100}%`, transition: 'width 0.25s linear, background 0.3s' }} />
+              </div>
+            </div>
+          )}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ fontSize: 10, color: '#555', letterSpacing: '0.2em', fontWeight: 700, textAlign: 'center', marginBottom: 2, animation: 'fadeIn 0.18s ease-out both' }}>WHAT NEXT?</div>
+            <button onClick={() => { haptic.medium(); onLogSet(savedSet, false, summaryRestEndsAt ?? undefined); }} style={{ width: '100%', padding: '22px 0', background: A, border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 800, letterSpacing: '0.08em', cursor: 'pointer', color: '#000', animation: 'slideUp 0.18s ease-out 0.05s both' }}>NEXT SET</button>
+            <button onClick={() => { haptic.light(); onLogSet(savedSet, true, summaryRestEndsAt ?? undefined); }} style={{ width: '100%', padding: '19px 0', background: '#1e1e1e', border: '0.5px solid #444', borderRadius: 12, fontSize: 14, fontWeight: 700, letterSpacing: '0.08em', cursor: 'pointer', color: '#fff', animation: 'slideUp 0.18s ease-out 0.1s both' }}>NEXT EXERCISE</button>
+            <button onClick={() => { haptic.light(); onLogSet(savedSet, 'end'); }} style={{ width: '100%', padding: '16px 0', background: 'transparent', border: '0.5px solid #333', borderRadius: 12, fontSize: 12, fontWeight: 700, letterSpacing: '0.12em', cursor: 'pointer', color: '#666', animation: 'slideUp 0.18s ease-out 0.15s both' }}>END SESSION</button>
+            <button disabled style={{ width: '100%', padding: '22px 0', background: '#080808', border: 'none', cursor: 'default', display: 'block' }} />
+          </div>
         </div>
       </div>
     );
@@ -542,15 +579,21 @@ export default function WorkoutScreen({ navigate }: { navigate: (s: ScreenName) 
     setExercise(ex); setBodyPart(bp || bodyPart); setSetNumber(prev + 1); setRestEndsAt(null); setStep('set_logger');
   };
 
-  const handleLog = (set: LoggedSet, andNext: boolean | 'end') => {
+  const handleLog = (set: LoggedSet, andNext: boolean | 'end', endsAt?: number) => {
     const updated = [...sessionSets, set];
     setSessionSets(updated); setsRef.current = updated; setLastSet(set);
     if (andNext === 'end') { setShowConfirmEnd(true); return; }
+    const finalEndsAt = endsAt ?? Date.now() + restDuration * 1000;
+    setRestEndsAt(finalEndsAt);
     if (andNext === true) {
-      setRestEndsAt(Date.now() + restDuration * 1000);
       setStep(activeTpl ? 'tpl_exercise' : 'exercise');
     } else {
-      setRestEndsAt(null); setSetNumber(n => n + 1); setStep('rest');
+      // If rest already expired (user waited on summary), go straight to set logger
+      if (finalEndsAt <= Date.now()) {
+        setSetNumber(n => n + 1); setStep('set_logger');
+      } else {
+        setStep('rest');
+      }
     }
   };
 
@@ -563,8 +606,8 @@ export default function WorkoutScreen({ navigate }: { navigate: (s: ScreenName) 
     if (step === 'body_part') return <BodyPartScreen onSelect={id => { setBodyPart(id); setStep('exercise'); }} onBack={() => sessionSets.length > 0 ? setStep('start') : navigate('home')} onFinish={tryEnd} sessionSets={sessionSets} />;
     if (step === 'tpl_exercise' && activeTpl) return <TemplateExerciseScreen template={activeTpl} sessionSets={sessionSets} onSelect={selectEx} onSwitchMuscle={() => { setRestEndsAt(null); setStep('body_part'); }} onBack={tryEnd} restEndsAt={restEndsAt} />;
     if (step === 'exercise' && bodyPart) return <ExerciseScreen bodyPartId={bodyPart} onSelect={ex => selectEx(ex, bodyPart)} onBack={() => { setRestEndsAt(null); setStep(activeTpl ? 'tpl_exercise' : 'body_part'); }} onSwitchMuscle={() => { setRestEndsAt(null); setStep('body_part'); }} restEndsAt={restEndsAt} />;
-    if (step === 'set_logger' && exercise && bodyPart) return <SetLogger exercise={exercise} bodyPartId={bodyPart} setNumber={setNumber} sessionSets={sessionSets} onLogSet={handleLog} onChangeExercise={() => setStep(activeTpl ? 'tpl_exercise' : 'exercise')} onSwitchMuscle={() => setStep('body_part')} />;
-    if (step === 'rest') return <RestTimer duration={restDuration} onDone={handleRest} isPR={lastSet?.isPR} nextLabel={exercise?.toUpperCase() + ' SET ' + setNumber} />;
+    if (step === 'set_logger' && exercise && bodyPart) return <SetLogger exercise={exercise} bodyPartId={bodyPart} setNumber={setNumber} sessionSets={sessionSets} onLogSet={handleLog} onChangeExercise={() => setStep(activeTpl ? 'tpl_exercise' : 'exercise')} onSwitchMuscle={() => setStep('body_part')} restDuration={restDuration} />;
+    if (step === 'rest' && restEndsAt) return <RestTimer endTime={restEndsAt} onDone={handleRest} isPR={lastSet?.isPR} nextLabel={exercise?.toUpperCase() + ' SET ' + (setNumber + 1)} />;
     if (step === 'summary') return <SessionSummary sessionSets={sessionSets} startTime={startTime.current} onDone={(note) => { const sessions = DB.get<{ note?: string }[]>('sessions', []); if (sessions.length) { sessions[sessions.length - 1].note = note || undefined; DB.set('sessions', sessions); } navigate('home'); }} />;
     return null;
   })();
