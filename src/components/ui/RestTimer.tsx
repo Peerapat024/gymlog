@@ -16,10 +16,16 @@ export default function RestTimer({ endTime, onDone, isPR, nextLabel }: RestTime
   const [total, setTotal] = useState(initialRem);
   const [bumped, setBumped] = useState(false);
 
+  const lastHapticSec = useRef<number | null>(null);
+
   useEffect(() => {
     const id = setInterval(() => {
       const r = Math.max(0, Math.floor((endAtRef.current - Date.now()) / 1000));
       setRem(r);
+      if (r <= 3 && r > 0 && r !== lastHapticSec.current) {
+        lastHapticSec.current = r;
+        haptic.medium();
+      }
       if (r <= 0) { clearInterval(id); onDone(); }
     }, 250);
     return () => clearInterval(id);
