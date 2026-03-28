@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { A } from '../../constants/theme';
 import { haptic } from '../../utils/haptics';
 
@@ -10,21 +10,23 @@ interface RestTimerProps {
 }
 
 export default function RestTimer({ duration, onDone, isPR, nextLabel }: RestTimerProps) {
+  const endAtRef = useRef(Date.now() + duration * 1000);
   const [rem, setRem] = useState(duration);
   const [total, setTotal] = useState(duration);
   const [bumped, setBumped] = useState(false);
 
   useEffect(() => {
-    const id = setInterval(() => setRem(r => {
-      if (r <= 1) { clearInterval(id); onDone(); return 0; }
-      return r - 1;
-    }), 1000);
+    const id = setInterval(() => {
+      const r = Math.max(0, Math.floor((endAtRef.current - Date.now()) / 1000));
+      setRem(r);
+      if (r <= 0) { clearInterval(id); onDone(); }
+    }, 250);
     return () => clearInterval(id);
   }, []);
 
   const addThirty = () => {
     haptic.medium();
-    setRem(r => r + 30);
+    endAtRef.current += 30000;
     setTotal(t => t + 30);
     setBumped(true);
     setTimeout(() => setBumped(false), 600);
