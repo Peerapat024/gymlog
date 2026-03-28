@@ -1,0 +1,33 @@
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{height:100%;background:#080808}
+body{
+  height:100%;
+  background:#080808;
+  overscroll-behavior:none;
+  font-family:-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;
+  color:#fff;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:max(env(safe-area-inset-bottom), 0px);
+}
+#root{
+  height:100%;
+  min-height:-webkit-fill-available;
+}
+button{-webkit-tap-highlight-color:transparent}
+input,textarea{font-size:16px;}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
+input[type=number]{-moz-appearance:textfield}
+.scroll{-webkit-overflow-scrolling:touch;overflow-y:auto}
+.screen-wrap{padding-bottom:max(100px,calc(env(safe-area-inset-bottom)+72px))}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes popIn{0%{opacity:0;transform:scale(0.6)}70%{transform:scale(1.15)}100%{opacity:1;transform:scale(1)}}
+@keyframes savePulse{0%{box-shadow:0 0 0 0 rgba(200,255,0,0.5)}60%{box-shadow:0 0 0 10px rgba(200,255,0,0)}100%{box-shadow:0 0 0 0 rgba(200,255,0,0)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes waveSlide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes slideRight{from{opacity:0;transform:translateX(32px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideLeft{from{opacity:0;transform:translateX(-32px)}to{opacity:1;transform:translateX(0)}}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+@keyframes blink{0%,90%,100%{transform:scaleY(1)}95%{transform:scaleY(0.08)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+@keyframes cursorBlink{0%,100%{opacity:1}50%{opacity:0}}
