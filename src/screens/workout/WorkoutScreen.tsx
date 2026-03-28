@@ -610,6 +610,7 @@ export default function WorkoutScreen({ navigate }: { navigate: (s: ScreenName) 
   const [sessionSets, setSessionSets] = useState<LoggedSet[]>([]);
   const [lastSet, setLastSet] = useState<LoggedSet | null>(null);
   const [restEndsAt, setRestEndsAt] = useState<number | null>(null);
+  const [fromNextEx, setFromNextEx] = useState(false);
   const [showConfirmEnd, setShowConfirmEnd] = useState(false);
   const startTime = useRef(Date.now());
   const setsRef = useRef<LoggedSet[]>([]);
@@ -622,7 +623,14 @@ export default function WorkoutScreen({ navigate }: { navigate: (s: ScreenName) 
 
   const selectEx = (ex: string, bp?: string) => {
     const prev = sessionSets.filter(s => s.exercise === ex).length;
-    setExercise(ex); setBodyPart(bp || bodyPart); setSetNumber(prev + 1); setRestEndsAt(null); setStep('set_logger');
+    setExercise(ex); setBodyPart(bp || bodyPart); setSetNumber(prev + 1);
+    if (restEndsAt && restEndsAt > Date.now()) {
+      setFromNextEx(true);
+      setStep('rest');
+    } else {
+      setFromNextEx(false);
+      setRestEndsAt(null); setStep('set_logger');
+    }
   };
 
   const handleLog = (set: LoggedSet, andNext: boolean | 'end', endsAt?: number) => {
@@ -643,7 +651,11 @@ export default function WorkoutScreen({ navigate }: { navigate: (s: ScreenName) 
     }
   };
 
-  const handleRest = () => { setSetNumber(n => n + 1); setStep('set_logger'); };
+  const handleRest = () => {
+    if (!fromNextEx) setSetNumber(n => n + 1);
+    setFromNextEx(false);
+    setStep('set_logger');
+  };
 
   const overlay = showConfirmEnd ? <ConfirmEnd onConfirm={confirmEnd} onCancel={cancelEnd} /> : null;
 
@@ -653,7 +665,7 @@ export default function WorkoutScreen({ navigate }: { navigate: (s: ScreenName) 
     if (step === 'tpl_exercise' && activeTpl) return <TemplateExerciseScreen template={activeTpl} sessionSets={sessionSets} onSelect={selectEx} onSwitchMuscle={() => { setRestEndsAt(null); setStep('body_part'); }} onBack={tryEnd} restEndsAt={restEndsAt} />;
     if (step === 'exercise' && bodyPart) return <ExerciseScreen bodyPartId={bodyPart} onSelect={ex => selectEx(ex, bodyPart)} onBack={() => { setRestEndsAt(null); setStep(activeTpl ? 'tpl_exercise' : 'body_part'); }} onSwitchMuscle={() => { setRestEndsAt(null); setStep('body_part'); }} restEndsAt={restEndsAt} />;
     if (step === 'set_logger' && exercise && bodyPart) return <SetLogger exercise={exercise} bodyPartId={bodyPart} setNumber={setNumber} sessionSets={sessionSets} onLogSet={handleLog} onChangeExercise={() => setStep(activeTpl ? 'tpl_exercise' : 'exercise')} onSwitchMuscle={() => setStep('body_part')} restDuration={restDuration} />;
-    if (step === 'rest' && restEndsAt) return <RestTimer endTime={restEndsAt} onDone={handleRest} isPR={lastSet?.isPR} nextLabel={exercise?.toUpperCase() + ' SET ' + (setNumber + 1)} />;
+    if (step === 'rest' && restEndsAt) return <RestTimer endTime={restEndsAt} onDone={handleRest} isPR={lastSet?.isPR} nextLabel={exercise?.toUpperCase() + ' SET ' + (fromNextEx ? setNumber : setNumber + 1)} />;
     if (step === 'summary') return <SessionSummary sessionSets={sessionSets} startTime={startTime.current} onDone={(note) => { const sessions = DB.get<{ note?: string }[]>('sessions', []); if (sessions.length) { sessions[sessions.length - 1].note = note || undefined; DB.set('sessions', sessions); } navigate('home'); }} />;
     return null;
   })();
