@@ -34,6 +34,7 @@ export default function RestTimer({ endTime, onDone, isPR, nextLabel }: RestTime
   const addThirty = () => {
     haptic.medium();
     endAtRef.current += 30000;
+    setRem(r => r + 30);
     setTotal(t => t + 30);
     setBumped(true);
     setTimeout(() => setBumped(false), 600);
@@ -51,7 +52,7 @@ export default function RestTimer({ endTime, onDone, isPR, nextLabel }: RestTime
   return (
     <div style={{ position: 'relative', height: '100svh', background: '#080808', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
       {/* Liquid fill */}
-      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: fillPct + '%', transition: 'height 1s ease-out', zIndex: 0 }}>
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: fillPct + '%', transition: 'height 0.3s linear', zIndex: 0 }}>
         <div style={{ position: 'absolute', top: -28, left: 0, right: 0, height: 32, overflow: 'hidden' }}>
           <div style={{ display: 'flex', width: '200%', height: '100%', animation: 'waveSlide 3s linear infinite' }}>
             <svg viewBox="0 0 400 32" preserveAspectRatio="none" style={{ width: '50%', height: '100%', flexShrink: 0 }}>
