@@ -99,7 +99,7 @@ export default function RestTimer({ endTime, onDone, isPR, nextLabel }: RestTime
           <button onClick={onDone} style={{ width: '100%', padding: '14px 0', background: 'transparent', border: '0.5px solid #333', borderRadius: 12, fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', cursor: 'pointer', color: '#777' }}>
             SKIP
           </button>
-          <button disabled style={{ width: '100%', padding: '22px 0', background: '#080808', border: 'none', cursor: 'default', display: 'block' }} />
+          <button disabled style={{ width: '100%', padding: '22px 0', background: 'transparent', border: 'none', cursor: 'default', display: 'block' }} />
         </div>
       </div>
     </div>
