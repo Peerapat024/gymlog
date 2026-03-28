@@ -536,9 +536,45 @@ function SessionSummary({ sessionSets, startTime, onDone }: {
           ))}
         </div>
         <Lbl>SESSION COMPLETE</Lbl>
-        <div style={{ fontSize: 'clamp(36px,9vw,56px)', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1, marginTop: 10, marginBottom: 20 }}>
+        <div style={{ fontSize: 'clamp(36px,9vw,56px)', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1, marginTop: 10, marginBottom: 24 }}>
           {userName ? <>{`NICE WORK,`}<br />{userName.toUpperCase()}!</> : <>GREAT<br />WORK.</>}
         </div>
+
+        {/* Exercise list — big, right under the compliment */}
+        <div style={{ marginBottom: 8 }}>
+          {Object.entries(byCnt).map(([ex, cnt]) => (
+            <div key={ex} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', paddingBottom: 10, marginBottom: 10, borderBottom: `0.5px solid ${B}` }}>
+              <span style={{ fontSize: 'clamp(22px,5.5vw,36px)', fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', lineHeight: 1.1, flex: 1, paddingRight: 12 }}>{ex.toUpperCase()}</span>
+              <span style={{ fontSize: 'clamp(14px,3.5vw,20px)', color: '#444', fontWeight: 700, letterSpacing: '0.04em', flexShrink: 0 }}>{cnt} SET{cnt !== 1 ? 'S' : ''}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Save as template */}
+        <div style={{ marginBottom: 28 }}>
+          {!tplOpen && !tplSaved && (
+            <button onClick={() => { haptic.light(); setTplOpen(true); }} style={{ background: 'none', border: `0.5px solid ${B}`, borderRadius: 8, padding: '10px 16px', color: '#555', cursor: 'pointer', fontSize: 11, letterSpacing: '0.12em', fontWeight: 700, width: '100%' }}>
+              + SAVE AS TEMPLATE
+            </button>
+          )}
+          {tplOpen && !tplSaved && (
+            <div style={{ background: D, border: `0.5px solid ${B}`, borderRadius: 12, padding: '14px 16px', animation: 'fadeIn 0.15s ease-out both' }}>
+              <Lbl style={{ marginBottom: 6 }}>TEMPLATE NAME</Lbl>
+              <input autoFocus value={tplName} onChange={e => setTplName(e.target.value)} onKeyDown={e => e.key === 'Enter' && saveAsTemplate()} placeholder="e.g. PUSH DAY A"
+                style={{ width: '100%', background: 'transparent', border: 'none', borderBottom: `1px solid ${B}`, padding: '8px 0', fontSize: 22, fontWeight: 800, color: '#fff', outline: 'none', letterSpacing: '-0.01em', marginBottom: 14 }} />
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button onClick={() => { haptic.light(); setTplOpen(false); }} style={{ padding: '12px 16px', background: 'transparent', border: `0.5px solid ${B}`, borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: 'pointer', color: '#555', letterSpacing: '0.1em' }}>CANCEL</button>
+                <button onClick={saveAsTemplate} disabled={!tplName.trim()} style={{ flex: 1, padding: '12px 0', background: tplName.trim() ? A : '#111', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: tplName.trim() ? 'pointer' : 'default', color: tplName.trim() ? '#000' : '#333', letterSpacing: '0.08em' }}>SAVE TEMPLATE</button>
+              </div>
+            </div>
+          )}
+          {tplSaved && (
+            <div style={{ padding: '10px 0', fontSize: 11, color: A, letterSpacing: '0.15em', fontWeight: 700, animation: 'fadeIn 0.2s ease-out both' }}>
+              ✓ "{tplName}" SAVED AS TEMPLATE
+            </div>
+          )}
+        </div>
+
         {prs.length > 0 && (
           <div style={{ background: '#0c100a', border: '0.5px solid #2a3a10', borderRadius: 12, padding: '14px 18px', marginBottom: 16 }}>
             <Lbl style={{ color: '#3a5010', marginBottom: 8 }}>PERSONAL RECORDS</Lbl>
@@ -551,41 +587,6 @@ function SessionSummary({ sessionSets, startTime, onDone }: {
               <Lbl style={{ marginBottom: 6 }}>{s.l}</Lbl><div style={{ fontSize: 28, fontWeight: 800 }}>{s.v}</div>
             </div>
           ))}
-        </div>
-        <div style={{ marginBottom: 20 }}>
-          {Object.entries(byCnt).map(([ex, cnt]) => (
-            <div key={ex} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '0.5px solid #111' }}>
-              <span style={{ fontSize: 13, color: '#888', fontWeight: 600 }}>{ex}</span>
-              <span style={{ fontSize: 10, color: '#666', letterSpacing: '0.12em', fontWeight: 700 }}>{cnt} SETS</span>
-            </div>
-          ))}
-        </div>
-        {/* Save as template */}
-        <div style={{ margin: '4px 0 20px' }}>
-          {!tplOpen && !tplSaved && (
-            <button onClick={() => { haptic.light(); setTplOpen(true); }} style={{ background: 'none', border: `0.5px solid ${B}`, borderRadius: 8, padding: '10px 16px', color: '#666', cursor: 'pointer', fontSize: 11, letterSpacing: '0.12em', fontWeight: 700, width: '100%' }}>
-              + SAVE AS TEMPLATE
-            </button>
-          )}
-          {tplOpen && !tplSaved && (
-            <div style={{ background: D, border: `0.5px solid ${B}`, borderRadius: 12, padding: '14px 16px', animation: 'fadeIn 0.15s ease-out both' }}>
-              <Lbl style={{ marginBottom: 10 }}>TEMPLATE NAME</Lbl>
-              <div style={{ fontSize: 11, color: '#555', letterSpacing: '0.08em', marginBottom: 12 }}>
-                {sessionExercises.map(e => e.name).join(' · ')}
-              </div>
-              <input autoFocus value={tplName} onChange={e => setTplName(e.target.value)} onKeyDown={e => e.key === 'Enter' && saveAsTemplate()} placeholder="e.g. PUSH DAY A"
-                style={{ width: '100%', background: 'transparent', border: 'none', borderBottom: `1px solid ${B}`, padding: '8px 0', fontSize: 18, fontWeight: 800, color: '#fff', outline: 'none', letterSpacing: '0.02em', marginBottom: 14 }} />
-              <div style={{ display: 'flex', gap: 8 }}>
-                <button onClick={() => { haptic.light(); setTplOpen(false); }} style={{ padding: '12px 16px', background: 'transparent', border: `0.5px solid ${B}`, borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: 'pointer', color: '#555', letterSpacing: '0.1em' }}>CANCEL</button>
-                <button onClick={saveAsTemplate} disabled={!tplName.trim()} style={{ flex: 1, padding: '12px 0', background: tplName.trim() ? A : '#111', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: tplName.trim() ? 'pointer' : 'default', color: tplName.trim() ? '#000' : '#333', letterSpacing: '0.08em' }}>SAVE TEMPLATE</button>
-              </div>
-            </div>
-          )}
-          {tplSaved && (
-            <div style={{ textAlign: 'center', padding: '10px 0', fontSize: 11, color: A, letterSpacing: '0.15em', fontWeight: 700, animation: 'fadeIn 0.2s ease-out both' }}>
-              ✓ TEMPLATE SAVED
-            </div>
-          )}
         </div>
 
         <textarea value={note} onChange={e => setNote(e.target.value)} placeholder="Any notes for next time..." rows={2}
