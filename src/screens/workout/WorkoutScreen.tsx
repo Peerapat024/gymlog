@@ -506,6 +506,23 @@ function SessionSummary({ sessionSets, startTime, onDone }: {
   const handleDone = () => { haptic.medium(); onDone(JSON.stringify({ mood, note: note.trim() })); };
   const userName = DB.get<string>('userName', '');
 
+  // Template saving
+  const sessionExercises: { name: string; bodyPart: string }[] = [];
+  const seen = new Set<string>();
+  sessionSets.forEach(s => { if (!seen.has(s.exercise)) { seen.add(s.exercise); sessionExercises.push({ name: s.exercise, bodyPart: s.bodyPart }); } });
+  const [tplOpen, setTplOpen] = useState(false);
+  const [tplName, setTplName] = useState('');
+  const [tplSaved, setTplSaved] = useState(false);
+
+  const saveAsTemplate = () => {
+    if (!tplName.trim()) return;
+    haptic.success();
+    const existing = DB.get<{ id: string; name: string; exercises: { name: string; bodyPart: string }[] }[]>('templates', []);
+    existing.push({ id: Date.now().toString(), name: tplName.trim(), exercises: sessionExercises });
+    DB.set('templates', existing);
+    setTplSaved(true);
+  };
+
   return (
     <div style={{ minHeight: '100svh', background: '#080808', animation: 'fadeIn 0.18s ease-out both', overflowY: 'auto' }}>
       <div style={{ padding: 'max(44px,env(safe-area-inset-top)) 28px', paddingBottom: 'max(140px,calc(env(safe-area-inset-bottom)+110px))', display: 'flex', flexDirection: 'column' }}>
@@ -543,6 +560,34 @@ function SessionSummary({ sessionSets, startTime, onDone }: {
             </div>
           ))}
         </div>
+        {/* Save as template */}
+        <div style={{ margin: '4px 0 20px' }}>
+          {!tplOpen && !tplSaved && (
+            <button onClick={() => { haptic.light(); setTplOpen(true); }} style={{ background: 'none', border: `0.5px solid ${B}`, borderRadius: 8, padding: '10px 16px', color: '#666', cursor: 'pointer', fontSize: 11, letterSpacing: '0.12em', fontWeight: 700, width: '100%' }}>
+              + SAVE AS TEMPLATE
+            </button>
+          )}
+          {tplOpen && !tplSaved && (
+            <div style={{ background: D, border: `0.5px solid ${B}`, borderRadius: 12, padding: '14px 16px', animation: 'fadeIn 0.15s ease-out both' }}>
+              <Lbl style={{ marginBottom: 10 }}>TEMPLATE NAME</Lbl>
+              <div style={{ fontSize: 11, color: '#555', letterSpacing: '0.08em', marginBottom: 12 }}>
+                {sessionExercises.map(e => e.name).join(' · ')}
+              </div>
+              <input autoFocus value={tplName} onChange={e => setTplName(e.target.value)} onKeyDown={e => e.key === 'Enter' && saveAsTemplate()} placeholder="e.g. PUSH DAY A"
+                style={{ width: '100%', background: 'transparent', border: 'none', borderBottom: `1px solid ${B}`, padding: '8px 0', fontSize: 18, fontWeight: 800, color: '#fff', outline: 'none', letterSpacing: '0.02em', marginBottom: 14 }} />
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button onClick={() => { haptic.light(); setTplOpen(false); }} style={{ padding: '12px 16px', background: 'transparent', border: `0.5px solid ${B}`, borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: 'pointer', color: '#555', letterSpacing: '0.1em' }}>CANCEL</button>
+                <button onClick={saveAsTemplate} disabled={!tplName.trim()} style={{ flex: 1, padding: '12px 0', background: tplName.trim() ? A : '#111', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: tplName.trim() ? 'pointer' : 'default', color: tplName.trim() ? '#000' : '#333', letterSpacing: '0.08em' }}>SAVE TEMPLATE</button>
+              </div>
+            </div>
+          )}
+          {tplSaved && (
+            <div style={{ textAlign: 'center', padding: '10px 0', fontSize: 11, color: A, letterSpacing: '0.15em', fontWeight: 700, animation: 'fadeIn 0.2s ease-out both' }}>
+              ✓ TEMPLATE SAVED
+            </div>
+          )}
+        </div>
+
         <textarea value={note} onChange={e => setNote(e.target.value)} placeholder="Any notes for next time..." rows={2}
           style={{ width: '100%', marginTop: 8, background: 'transparent', border: 'none', borderTop: '0.5px solid #141414', padding: '14px 0 0', color: '#555', fontSize: 14, outline: 'none', resize: 'none', fontFamily: 'inherit', lineHeight: 1.6 }} />
         <button onClick={handleDone} style={{ marginTop: 20, width: '100%', padding: '20px 0', background: mood ? MOOD_BTNS.find(b => b.id === mood)?.color || A : A, border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 800, letterSpacing: '0.12em', cursor: 'pointer', color: mood && !MOOD_BTNS.find(b => b.id === mood)?.dark ? '#fff' : '#000', transition: 'background 0.3s' }}>DONE</button>
