@@ -9,26 +9,27 @@ const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 let _input: HTMLInputElement | null = null;
 let _label: HTMLLabelElement | null = null;
 
-const getElements = () => {
+const getInput = () => {
   if (!_input) {
     const id = '__haptic';
     _input = document.createElement('input');
     _input.type = 'checkbox';
     _input.setAttribute('switch', '');
     _input.id = id;
-    Object.assign(_input.style, { position: 'fixed', left: '-9999px', top: '0', opacity: '0.01', pointerEvents: 'none' });
+    // Keep it tiny but in the top-left corner — fully off-screen clips can prevent iOS from recognising it
+    Object.assign(_input.style, { position: 'fixed', top: '0', left: '0', width: '1px', height: '1px', opacity: '0.001', pointerEvents: 'none', zIndex: '-1' });
     _label = document.createElement('label');
     _label.setAttribute('for', id);
-    Object.assign(_label.style, { position: 'fixed', left: '-9999px', top: '0', opacity: '0.01', pointerEvents: 'none' });
+    Object.assign(_label.style, { position: 'fixed', top: '0', left: '0', width: '1px', height: '1px', opacity: '0.001', pointerEvents: 'none', zIndex: '-1' });
     document.body.appendChild(_input);
     document.body.appendChild(_label);
   }
-  return _label!;
+  return _input!;
 };
 
 const iosHaptic = (count = 1, delayMs = 65) => {
-  const label = getElements();
-  const fire = () => label.click();
+  const input = getInput();
+  const fire = () => input.click();
   fire();
   for (let i = 1; i < count; i++) setTimeout(fire, i * delayMs);
 };

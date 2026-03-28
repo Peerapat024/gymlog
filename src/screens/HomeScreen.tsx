@@ -30,7 +30,8 @@ export default function HomeScreen({ navigate }: { navigate: (s: ScreenName) => 
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         {items.map((item, i) => (
           <button key={item.key}
-            onPointerDown={() => { setPressed(item.key); haptic.light(); }}
+            onTouchStart={() => haptic.light()}
+            onPointerDown={() => setPressed(item.key)}
             onPointerUp={() => { setPressed(null); navigate(item.key); }}
             onPointerLeave={() => setPressed(null)}
             style={{ flex: 1, background: pressed === item.key ? '#0f0f0f' : 'transparent', border: 'none', borderTop: i > 0 ? `0.5px solid ${B}` : 'none', cursor: 'pointer', padding: '0 32px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', transition: 'background 0.08s, transform 0.12s', transform: pressed === item.key ? 'scale(0.97)' : 'scale(1)' }}>
