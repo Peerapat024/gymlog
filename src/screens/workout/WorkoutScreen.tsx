@@ -553,7 +553,7 @@ function SessionSummary({ sessionSets, startTime, onDone }: {
         {/* Save as template */}
         <div style={{ marginBottom: 28 }}>
           {!tplOpen && !tplSaved && (
-            <button onClick={() => { haptic.light(); setTplOpen(true); }} style={{ background: 'none', border: `0.5px solid ${B}`, borderRadius: 8, padding: '10px 16px', color: '#555', cursor: 'pointer', fontSize: 11, letterSpacing: '0.12em', fontWeight: 700, width: '100%' }}>
+            <button onClick={() => { haptic.light(); setTplOpen(true); }} style={{ background: 'rgba(200,255,0,0.06)', border: `1px solid rgba(200,255,0,0.4)`, borderRadius: 8, padding: '12px 16px', color: 'rgba(200,255,0,0.8)', cursor: 'pointer', fontSize: 11, letterSpacing: '0.15em', fontWeight: 800, width: '100%' }}>
               + SAVE AS TEMPLATE
             </button>
           )}
