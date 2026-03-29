@@ -329,17 +329,17 @@ function ExerciseScreen({ bodyPartId, onSelect, onBack, onSwitchMuscle, restEnds
             <button
               key={ex}
               onClick={() => { haptic.light(); onSelect(ex); }}
-              style={{ width: '100%', padding: '14px 16px', background: D, border: `0.5px solid ${B}`, borderRadius: 11, cursor: 'pointer', textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 }}
+              style={{ width: '100%', padding: '18px 18px', background: D, border: `0.5px solid ${B}`, borderRadius: 14, cursor: 'pointer', textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}
             >
               <div style={{ flex: 1, minWidth: 0 }}>
                 {/* Name row + equipment badge */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: info ? 4 : (lastTopW ? 5 : 0) }}>
-                  <span style={{ fontSize: 15, fontWeight: 700, color: '#fff', lineHeight: 1.2 }}>{ex}</span>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: info ? 6 : (lastTopW ? 7 : 0) }}>
+                  <span style={{ fontSize: 20, fontWeight: 800, color: '#fff', lineHeight: 1.15, letterSpacing: '-0.01em' }}>{ex}</span>
                   {info?.equipment && <EquipBadge type={info.equipment} />}
                 </div>
                 {/* Focus area */}
                 {info && (
-                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginBottom: lastTopW || pr > 0 ? 6 : 0, lineHeight: 1.4 }}>
+                  <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.35)', marginBottom: lastTopW || pr > 0 ? 8 : 0, lineHeight: 1.4 }}>
                     {info.focus}
                   </div>
                 )}
@@ -359,7 +359,7 @@ function ExerciseScreen({ bodyPartId, onSelect, onBack, onSwitchMuscle, restEnds
                   )}
                 </div>
               </div>
-              <span style={{ fontSize: 18, color: 'rgba(255,255,255,0.18)', flexShrink: 0, marginTop: 2 }}>›</span>
+              <span style={{ fontSize: 18, color: 'rgba(255,255,255,0.18)', flexShrink: 0, marginTop: 3 }}>›</span>
             </button>
           );
         })}
@@ -408,14 +408,14 @@ function TemplateExerciseScreen({ template, sessionSets, onSelect, onSwitchMuscl
           const info = getExerciseInfo(ex.name);
           return (
             <button key={ex.name} onClick={() => { haptic.light(); onSelect(ex.name, ex.bodyPart); }}
-              style={{ padding: '14px 16px', background: D, border: `0.5px solid ${B}`, borderRadius: 11, cursor: 'pointer', textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10, opacity: cnt >= 4 ? 0.35 : 1 }}>
+              style={{ padding: '18px 18px', background: D, border: `0.5px solid ${B}`, borderRadius: 14, cursor: 'pointer', textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, opacity: cnt >= 4 ? 0.35 : 1 }}>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: info ? 4 : 3 }}>
-                  <span style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>{ex.name}</span>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: info ? 6 : 4 }}>
+                  <span style={{ fontSize: 20, fontWeight: 800, color: '#fff', letterSpacing: '-0.01em', lineHeight: 1.15 }}>{ex.name}</span>
                   {info?.equipment && <EquipBadge type={info.equipment} />}
                 </div>
                 {info && (
-                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)', marginBottom: 5, lineHeight: 1.4 }}>{info.focus}</div>
+                  <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.35)', marginBottom: 7, lineHeight: 1.4 }}>{info.focus}</div>
                 )}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                   {pr > 0 && <span style={{ fontSize: 9, fontWeight: 800, color: '#000', background: A, padding: '2px 6px', borderRadius: 4 }}>{pr}KG PR</span>}
@@ -424,7 +424,7 @@ function TemplateExerciseScreen({ template, sessionSets, onSelect, onSwitchMuscl
                   </span>
                 </div>
               </div>
-              <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.18)', flexShrink: 0, marginTop: 2 }}>→</span>
+              <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.18)', flexShrink: 0, marginTop: 3 }}>›</span>
             </button>
           );
         })}
