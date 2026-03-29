@@ -3,6 +3,7 @@ import { A, D, B, M, BG } from '../../constants/theme';
 import { DB } from '../../utils/db';
 import { haptic } from '../../utils/haptics';
 import { getExercises, getExerciseInfo, getCustomExercises, saveCustomExercises, getHistory, getPR, getTemplates, getSplits, saveSession } from '../../utils/dataHelpers';
+import { DEFAULT_TEMPLATES } from '../../constants/exercises';
 import type { EquipmentType } from '../../types';
 import { Back, Lbl, BigTitle } from '../../components/shared';
 import RepWheel from '../../components/ui/RepWheel';
@@ -147,7 +148,8 @@ function WorkoutStartScreen({ sessionSets, onFresh, onTemplate, onFinish }: {
   onFinish: () => void;
 }) {
   const splits = getSplits();
-  const userTemplates = getTemplates().filter(t => !t.id.startsWith('default-'));
+  const defaultIds = new Set(DEFAULT_TEMPLATES.map(t => t.id));
+  const userTemplates = getTemplates().filter(t => !defaultIds.has(t.id));
   const inSession = sessionSets.length > 0;
 
   const handleSelectDay = (split: TrainingSplit, dayIdx: number) => {
@@ -182,17 +184,6 @@ function WorkoutStartScreen({ sessionSets, onFresh, onTemplate, onFinish }: {
           <span style={{ fontSize: 20, fontWeight: 700 }}>→</span>
         </button>
 
-        {/* Splits */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 4px 2px' }}>
-          <div style={{ flex: 1, height: '0.5px', background: B }} />
-          <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.2em', fontWeight: 700 }}>TRAINING SPLITS</span>
-          <div style={{ flex: 1, height: '0.5px', background: B }} />
-        </div>
-
-        {splits.map(split => (
-          <SplitCard key={split.id} split={split} onSelectDay={handleSelectDay} />
-        ))}
-
         {/* User's custom templates */}
         {userTemplates.length > 0 && (<>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 4px 2px' }}>
@@ -212,6 +203,17 @@ function WorkoutStartScreen({ sessionSets, onFresh, onTemplate, onFinish }: {
             </button>
           ))}
         </>)}
+
+        {/* Splits */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 4px 2px' }}>
+          <div style={{ flex: 1, height: '0.5px', background: B }} />
+          <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.2em', fontWeight: 700 }}>TRAINING SPLITS</span>
+          <div style={{ flex: 1, height: '0.5px', background: B }} />
+        </div>
+
+        {splits.map(split => (
+          <SplitCard key={split.id} split={split} onSelectDay={handleSelectDay} />
+        ))}
       </div>
     </div>
   );
