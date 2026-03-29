@@ -52,7 +52,20 @@ export function getPR(name: string): number {
 
 export function getTemplates(): Template[] {
   const s = DB.get<Template[] | null>('templates', null);
-  return s !== null ? s : DEFAULT_TEMPLATES;
+  if (s !== null) return s;
+  // First launch: seed from all split days, deduplicating by name
+  const seenNames = new Set<string>();
+  const fromSplits: Template[] = [];
+  for (const split of DEFAULT_SPLITS) {
+    for (let i = 0; i < split.days.length; i++) {
+      const day = split.days[i];
+      if (!seenNames.has(day.name)) {
+        seenNames.add(day.name);
+        fromSplits.push({ id: `split-${split.id}-${i}`, name: day.name, exercises: day.exercises });
+      }
+    }
+  }
+  return fromSplits;
 }
 
 export function getSplits(): TrainingSplit[] {

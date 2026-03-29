@@ -460,12 +460,11 @@ function SetLogger({ exercise, bodyPartId, setNumber, sessionSets, onLogSet, onC
   const weightHint = isDBExercise ? 'ENTER TOTAL WEIGHT (BOTH SIDES COMBINED)' : isCableExercise ? 'CABLE STACK WEIGHT (BOTH SIDES TOTAL)' : null;
   const bwKg = parseFloat(DB.get<string>('bodyweight', '')) || 0;
   const [bwMode, setBwMode] = useState(isBWExercise && bwKg > 0);
-  const [bwSign, setBwSign] = useState('+');
 
   const prevWeightKg = prev?.weight || null;
   const prevWeightDisplay = prevWeightKg
     ? (bwMode
-      ? String(Math.abs(Math.round((prevWeightKg - bwKg) * 10) / 10))
+      ? String(Math.round((prevWeightKg - bwKg) * 10) / 10)  // signed: positive=weighted, negative=assisted
       : (unit === 'lbs' ? String(Math.round(prevWeightKg * KG_TO_LBS * 10) / 10) : String(prevWeightKg)))
     : '';
   const [weight, setWeight] = useState(prevWeightDisplay);
@@ -492,7 +491,7 @@ function SetLogger({ exercise, bodyPartId, setNumber, sessionSets, onLogSet, onC
     const w = parseFloat(weight) || 0;
     const wKg = unit === 'lbs' ? Math.round(w / KG_TO_LBS * 10) / 10 : w;
     if (!bwMode) return wKg;
-    return bwSign === '+' ? Math.round((bwKg + wKg) * 10) / 10 : Math.max(0, Math.round((bwKg - wKg) * 10) / 10);
+    return Math.max(0, Math.round((bwKg + wKg) * 10) / 10);
   };
 
   const pr = getPR(exercise);
@@ -517,18 +516,25 @@ function SetLogger({ exercise, bodyPartId, setNumber, sessionSets, onLogSet, onC
     return () => clearInterval(id);
   }, [showActions, summaryRestEndsAt]);
 
-  const handleWeight = (v: string) => { if (v === '' || /^\d*\.?\d*$/.test(v)) setWeight(v); };
+  const handleWeight = (v: string) => {
+    if (isBWExercise) {
+      if (v === '' || v === '-' || /^-?\d*\.?\d*$/.test(v)) setWeight(v);
+    } else {
+      if (v === '' || /^\d*\.?\d*$/.test(v)) setWeight(v);
+    }
+  };
   const canSave = bwMode ? parseInt(reps) > 0 : !!(parseFloat(weight) > 0 && parseInt(reps) > 0);
   const step = unit === 'lbs' ? 5 : 2.5;
 
   const handleSave = () => {
-    const addedKg = parseFloat(weight) || 0;
+    const addedVal = parseFloat(weight) || 0;
     const wkg = weightKg(), r = parseInt(reps);
     if (bwMode && !r) return;
     if (!bwMode && (!wkg || !r)) return;
     const isPR = wkg > pr;
     isPR ? haptic.pr() : haptic.success();
-    const set: LoggedSet = { exercise, bodyPart: bodyPartId, weight: wkg, reps: r, setNumber, isPR, note: note.trim() || undefined, unit: unit as 'kg' | 'lbs', bwMode: bwMode || undefined, bwSign: bwMode ? (bwSign as '+' | '-') : undefined, addedKg: bwMode ? addedKg : undefined, _ts: Date.now() };
+    const derivedSign: '+' | '-' = addedVal >= 0 ? '+' : '-';
+    const set: LoggedSet = { exercise, bodyPart: bodyPartId, weight: wkg, reps: r, setNumber, isPR, note: note.trim() || undefined, unit: unit as 'kg' | 'lbs', bwMode: bwMode || undefined, bwSign: bwMode ? derivedSign : undefined, addedKg: bwMode ? Math.abs(addedVal) : undefined, _ts: Date.now() };
     setSavedSet(set);
     setSummaryRestEndsAt(Date.now() + restDuration * 1000);
     setSummaryRem(restDuration);
@@ -636,9 +642,9 @@ function SetLogger({ exercise, bodyPartId, setNumber, sessionSets, onLogSet, onC
         {/* Weight */}
         <div style={{ marginBottom: 12 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-            <Lbl>{bwMode ? (bwSign === '+' ? 'EXTRA WEIGHT (KG)' : 'ASSIST WEIGHT (KG)') : `WEIGHT (${unit.toUpperCase()})`}</Lbl>
+            <Lbl>{bwMode ? ((parseFloat(weight) || 0) < 0 ? 'ASSIST WEIGHT (KG)' : 'EXTRA WEIGHT (KG)') : `WEIGHT (${unit.toUpperCase()})`}</Lbl>
             {isBWExercise && bwKg > 0 && (
-              <button onClick={() => { haptic.light(); setBwMode(m => !m); setWeight(''); setBwSign('+'); }}
+              <button onClick={() => { haptic.light(); setBwMode(m => !m); setWeight(''); }}
                 style={{ padding: '5px 12px', borderRadius: 7, border: `0.5px solid ${bwMode ? 'rgba(200,255,0,0.4)' : B}`, background: bwMode ? 'rgba(200,255,0,0.08)' : 'transparent', cursor: 'pointer', fontSize: 9, fontWeight: 800, color: bwMode ? A : 'rgba(255,255,255,0.3)', letterSpacing: '0.1em' }}>
                 {bwMode ? 'BW MODE ✓' : 'BW MODE'}
               </button>
@@ -646,24 +652,20 @@ function SetLogger({ exercise, bodyPartId, setNumber, sessionSets, onLogSet, onC
           </div>
           {bwMode && (
             <div style={{ marginBottom: 10 }}>
-              <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
-                {[{ sign: '+', label: 'WEIGHTED', hint: 'BW + extra weight' }, { sign: '-', label: 'ASSISTED', hint: 'BW − assist weight' }].map(opt => (
-                  <button key={opt.sign} onClick={() => { haptic.light(); setBwSign(opt.sign); setWeight(''); }}
-                    style={{ flex: 1, padding: '10px 8px', borderRadius: 10, cursor: 'pointer', textAlign: 'center', background: bwSign === opt.sign ? 'rgba(200,255,0,0.08)' : 'transparent', border: `0.5px solid ${bwSign === opt.sign ? 'rgba(200,255,0,0.35)' : B}`, transition: 'all 0.15s' }}>
-                    <div style={{ fontSize: 13, fontWeight: 800, color: bwSign === opt.sign ? A : 'rgba(255,255,255,0.25)', letterSpacing: '0.04em' }}>{opt.sign} {opt.label}</div>
-                    <div style={{ fontSize: 9, color: bwSign === opt.sign ? 'rgba(200,255,0,0.4)' : 'rgba(255,255,255,0.1)', marginTop: 2, letterSpacing: '0.06em' }}>{opt.hint}</div>
-                  </button>
-                ))}
-              </div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '10px 14px', background: '#080808', borderRadius: 10, border: `0.5px solid ${B}` }}>
                 <span style={{ fontSize: 16, fontWeight: 800, color: A }}>{bwKg}KG</span>
-                <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.25)', fontWeight: 700 }}>{bwSign}</span>
-                <span style={{ fontSize: 16, fontWeight: 800, color: parseFloat(weight) > 0 ? '#fff' : 'rgba(255,255,255,0.1)' }}>{parseFloat(weight) > 0 ? weight + 'KG' : '?KG'}</span>
+                <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.25)', fontWeight: 700 }}>{(parseFloat(weight) || 0) < 0 ? '−' : '+'}</span>
+                <span style={{ fontSize: 16, fontWeight: 800, color: weight && weight !== '-' ? '#fff' : 'rgba(255,255,255,0.15)' }}>
+                  {weight && weight !== '-' ? Math.abs(parseFloat(weight) || 0) + 'KG' : '?KG'}
+                </span>
                 <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.25)', fontWeight: 700 }}>=</span>
                 <span style={{ fontSize: 18, fontWeight: 900, color: '#fff' }}>
-                  {parseFloat(weight) > 0 ? (bwSign === '+' ? Math.round((bwKg + (parseFloat(weight) || 0)) * 10) / 10 : Math.max(0, Math.round((bwKg - (parseFloat(weight) || 0)) * 10) / 10)) : bwKg}KG
+                  {Math.max(0, Math.round((bwKg + (parseFloat(weight) || 0)) * 10) / 10)}KG
                 </span>
                 <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.08em', fontWeight: 600 }}>LOGGED</span>
+              </div>
+              <div style={{ marginTop: 5, textAlign: 'center', fontSize: 9, color: 'rgba(255,255,255,0.18)', letterSpacing: '0.1em', fontWeight: 600 }}>
+                NEGATIVE = ASSISTED · POSITIVE = WEIGHTED
               </div>
             </div>
           )}
@@ -675,7 +677,7 @@ function SetLogger({ exercise, bodyPartId, setNumber, sessionSets, onLogSet, onC
             </div>
           )}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <button onClick={() => { haptic.light(); setWeight(w => Math.max(0, (parseFloat(w) || 0) - step).toFixed(1).replace(/\.0$/, '')); }}
+            <button onClick={() => { haptic.light(); setWeight(w => { const next = (parseFloat(w) || 0) - step; const clamped = isBWExercise ? next : Math.max(0, next); return clamped.toFixed(1).replace(/\.0$/, ''); }); }}
               style={{ width: 52, height: 52, borderRadius: 14, background: '#161616', border: 'none', color: 'rgba(255,255,255,0.5)', fontSize: 24, fontWeight: 300, cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               −
             </button>

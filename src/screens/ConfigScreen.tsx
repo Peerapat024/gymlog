@@ -106,6 +106,7 @@ function LibraryScreen({ onBack }: { onBack: () => void }) {
   const [editingTpl, setEditingTpl] = useState<Template | null>(null);
   const [tplName, setTplName] = useState('');
   const [tplPart, setTplPart] = useState('chest');
+  const [tplNameError, setTplNameError] = useState('');
 
   const saveCEx = (u: Record<string, CustomExercise[]>) => { setCustomEx(u); saveCustomExercises(u); };
   const saveTpls = (u: Template[]) => { setTemplates(u); DB.set('templates', u); };
@@ -122,6 +123,9 @@ function LibraryScreen({ onBack }: { onBack: () => void }) {
   const saveTpl = () => {
     const n = tplName.trim();
     if (!n || !editingTpl || !editingTpl.exercises.length) return;
+    const duplicate = templates.find(x => x.name.toLowerCase() === n.toLowerCase() && x.id !== editingTpl.id);
+    if (duplicate) { setTplNameError('A template named "' + duplicate.name + '" already exists.'); return; }
+    setTplNameError('');
     const t = { ...editingTpl, name: n };
     const ex = templates.find(x => x.id === t.id);
     saveTpls(ex ? templates.map(x => x.id === t.id ? t : x) : [...templates, t]);
@@ -138,8 +142,9 @@ function LibraryScreen({ onBack }: { onBack: () => void }) {
         <BigTitle>{editingTpl.exercises.length === 0 ? 'BUILD\nTEMPLATE' : `${editingTpl.exercises.length} SELECTED`}</BigTitle>
         <div style={{ marginTop: 24, marginBottom: 20 }}>
           <Lbl style={{ marginBottom: 8 }}>TEMPLATE NAME</Lbl>
-          <input value={tplName} onChange={e => setTplName(e.target.value)} placeholder="e.g. Push Day"
-            style={{ width: '100%', background: D, border: `0.5px solid ${B}`, borderRadius: 10, padding: '13px 14px', color: '#fff', fontSize: 16, fontWeight: 700, outline: 'none' }} />
+          <input value={tplName} onChange={e => { setTplName(e.target.value); setTplNameError(''); }} placeholder="e.g. Push Day"
+            style={{ width: '100%', background: D, border: `0.5px solid ${tplNameError ? '#FF453A' : B}`, borderRadius: 10, padding: '13px 14px', color: '#fff', fontSize: 16, fontWeight: 700, outline: 'none' }} />
+          {tplNameError && <div style={{ marginTop: 6, fontSize: 11, color: '#FF453A', fontWeight: 600 }}>{tplNameError}</div>}
         </div>
         {editingTpl.exercises.length > 0 && (
           <div style={{ marginBottom: 20 }}>
@@ -251,7 +256,7 @@ function LibraryScreen({ onBack }: { onBack: () => void }) {
 
       {tab === 'templates' && (
         <div>
-          <button onClick={() => { setTplName(''); setEditingTpl({ id: Date.now().toString(), name: '', exercises: [] }); }}
+          <button onClick={() => { setTplName(''); setTplNameError(''); setEditingTpl({ id: Date.now().toString(), name: '', exercises: [] }); }}
             style={{ width: '100%', padding: '16px', marginBottom: 16, background: 'transparent', border: `0.5px solid ${B}`, borderRadius: 11, color: A, fontSize: 12, fontWeight: 800, letterSpacing: '0.12em', cursor: 'pointer' }}>
             + CREATE NEW TEMPLATE
           </button>
@@ -263,7 +268,7 @@ function LibraryScreen({ onBack }: { onBack: () => void }) {
                   <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.28)', marginTop: 3, letterSpacing: '0.08em' }}>{tpl.exercises.length} EXERCISES</div>
                 </div>
                 <div style={{ display: 'flex', gap: 10 }}>
-                  <button onClick={() => { setEditingTpl({ ...tpl, exercises: [...tpl.exercises] }); setTplName(tpl.name); }}
+                  <button onClick={() => { setEditingTpl({ ...tpl, exercises: [...tpl.exercises] }); setTplName(tpl.name); setTplNameError(''); }}
                     style={{ background: 'none', border: `0.5px solid ${B}`, borderRadius: 6, padding: '5px 10px', color: M, cursor: 'pointer', fontSize: 10, fontWeight: 700 }}>EDIT</button>
                   <button onClick={() => saveTpls(templates.filter(t => t.id !== tpl.id))}
                     style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', cursor: 'pointer', fontSize: 10, fontWeight: 700 }}>DELETE</button>
