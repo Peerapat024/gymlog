@@ -11,7 +11,7 @@ export default function ConfirmEnd({ onConfirm, onCancel }: { onConfirm: () => v
           <button onClick={onCancel} style={{ width: '100%', padding: '16px 0', background: 'transparent', border: '0.5px solid #333', borderRadius: 12, fontSize: 13, fontWeight: 700, letterSpacing: '0.08em', cursor: 'pointer', color: '#666' }}>
             KEEP GOING
           </button>
-          <button disabled style={{ width: '100%', padding: '22px 0', background: '#080808', border: 'none', cursor: 'default', display: 'block' }} />
+          <button disabled style={{ width: '100%', padding: '22px 0', background: '#000', border: 'none', cursor: 'default', display: 'block' }} />
         </div>
       </div>
     </div>

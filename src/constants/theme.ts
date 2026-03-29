@@ -1,4 +1,9 @@
-export const A = '#C8FF00'; // accent / primary
-export const D = '#1a1a1a'; // card background
-export const B = '#282828'; // border
-export const M = '#999';    // muted text
+export const A     = '#C8FF00';                    // lime accent
+export const D     = '#111111';                    // card surface
+export const B     = 'rgba(255,255,255,0.08)';    // border
+export const M     = 'rgba(255,255,255,0.38)';    // muted text
+export const BG    = '#000000';                    // background
+export const S     = '#1A1A1A';                    // elevated surface
+export const T3    = 'rgba(255,255,255,0.2)';     // tertiary text
+export const ADIM  = 'rgba(200,255,0,0.08)';      // accent dim background
+export const ABD   = 'rgba(200,255,0,0.3)';       // accent border

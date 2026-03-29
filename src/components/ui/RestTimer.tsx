@@ -50,7 +50,7 @@ export default function RestTimer({ endTime, onDone, isPR, nextLabel }: RestTime
   const fillPct = pct * 88 + 2;
 
   return (
-    <div style={{ position: 'relative', height: '100svh', background: '#080808', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ position: 'relative', height: '100svh', background: '#000', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
       {/* Liquid fill */}
       <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: fillPct + '%', transition: 'height 0.3s linear', zIndex: 0 }}>
         <div style={{ position: 'absolute', top: -28, left: 0, right: 0, height: 32, overflow: 'hidden' }}>

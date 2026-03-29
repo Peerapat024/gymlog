@@ -26,7 +26,7 @@ export default function ExerciseDetail({ name, onBack }: { name: string; onBack:
   useEffect(() => { if (ref.current) setChartW(ref.current.offsetWidth - 4); }, []);
 
   return (
-    <div style={{ minHeight: '100svh', background: '#080808', padding: 'max(44px,env(safe-area-inset-top)) 24px', paddingBottom: 'max(140px,calc(env(safe-area-inset-bottom)+110px))' }}>
+    <div style={{ minHeight: '100svh', background: '#000', padding: 'max(44px,env(safe-area-inset-top)) 24px', paddingBottom: 'max(140px,calc(env(safe-area-inset-bottom)+110px))' }}>
       <Back onBack={onBack} />
       <Lbl style={{ marginTop: 20 }}>EXERCISE</Lbl>
       <div style={{ fontSize: 'clamp(20px,5vw,30px)', fontWeight: 800, letterSpacing: '-0.02em', marginTop: 8, marginBottom: 24, lineHeight: 1.1 }}>{name.toUpperCase()}</div>

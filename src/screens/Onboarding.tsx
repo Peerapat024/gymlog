@@ -41,7 +41,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
       <Progress total={3} current={0} />
       <div style={{ padding: '0 24px' }}>
         <button onClick={() => { haptic.light(); goTo(1); }} style={{ width: '100%', padding: '22px', background: A, border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 800, letterSpacing: '0.08em', cursor: 'pointer', color: '#000' }}>LET'S SET UP →</button>
-        <button disabled style={{ width: '100%', padding: '22px 0', background: '#080808', border: 'none', cursor: 'default', display: 'block' }} />
+        <button disabled style={{ width: '100%', padding: '22px 0', background: '#000', border: 'none', cursor: 'default', display: 'block' }} />
       </div>
     </div>,
 
@@ -62,7 +62,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
             {name.trim() ? 'NICE TO MEET YOU, ' + name.trim().toUpperCase() + ' →' : 'SKIP →'}
           </button>
         </div>
-        <button disabled style={{ width: '100%', padding: '22px 0', background: '#080808', border: 'none', cursor: 'default', display: 'block' }} />
+        <button disabled style={{ width: '100%', padding: '22px 0', background: '#000', border: 'none', cursor: 'default', display: 'block' }} />
       </div>
     </div>,
 
@@ -92,13 +92,13 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
             {bodyweight ? "ALL SET, LET'S LIFT →" : 'SKIP →'}
           </button>
         </div>
-        <button disabled style={{ width: '100%', padding: '22px 0', background: '#080808', border: 'none', cursor: 'default', display: 'block' }} />
+        <button disabled style={{ width: '100%', padding: '22px 0', background: '#000', border: 'none', cursor: 'default', display: 'block' }} />
       </div>
     </div>,
   ];
 
   return (
-    <div style={{ height: '100svh', background: '#080808', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <div style={{ height: '100svh', background: '#000', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <div style={{ height: 6, background: '#111', flexShrink: 0 }}>
         <div style={{ height: '100%', background: A, width: ((step / 2) * 100) + '%', transition: 'width 0.3s ease', borderRadius: 3 }} />
       </div>
