@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { A, D, B, M } from '../constants/theme';
 import { DB } from '../utils/db';
 import { haptic } from '../utils/haptics';
-import { getExercises, getTemplates } from '../utils/dataHelpers';
+import { getExercises, getTemplates, getCustomExercises, saveCustomExercises } from '../utils/dataHelpers';
 import { Back, Lbl, BigTitle, SegmentWrap, SegBtn } from '../components/shared';
 import { PROVIDERS } from '../utils/ai';
 import { LIBRARY, ALL_PARTS } from '../constants/exercises';
-import type { EquipmentType } from '../types';
+import type { EquipmentType, CustomExercise } from '../types';
 import type { ScreenName, AIProvider, Template, WeightUnit } from '../types';
 
 /* ─── Equipment badge (for library screen) ──────────────────────────────────── */
@@ -22,25 +22,98 @@ function LibEquipBadge({ type }: { type: EquipmentType }) {
   return <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.06em', color: e.text, flexShrink: 0 }}>{e.label}</span>;
 }
 
+const EQUIPMENT_OPTIONS: EquipmentType[] = ['Barbell', 'Dumbbell', 'Cable', 'Machine', 'Bodyweight'];
+
+/* ─── Add-exercise form (shared between LibraryScreen and WorkoutScreen) ─────── */
+function AddExerciseForm({ onAdd, onCancel, autoFocus = true }: {
+  onAdd: (ex: CustomExercise) => void;
+  onCancel: () => void;
+  autoFocus?: boolean;
+}) {
+  const [name, setName] = useState('');
+  const [focus, setFocus] = useState('');
+  const [equipment, setEquipment] = useState<EquipmentType | null>(null);
+  const [showDetails, setShowDetails] = useState(false);
+
+  const canAdd = name.trim().length > 0;
+  const handleAdd = () => {
+    if (!canAdd) return;
+    onAdd({ name: name.trim(), focus: focus.trim() || undefined, equipment: equipment ?? undefined });
+  };
+
+  return (
+    <div style={{ background: '#0D0D0D', border: `0.5px solid ${B}`, borderRadius: 14, padding: '16px', animation: 'fadeIn 0.15s ease-out both' }}>
+      <Lbl style={{ marginBottom: 10 }}>NEW EXERCISE</Lbl>
+      {/* Name */}
+      <input
+        autoFocus={autoFocus}
+        value={name}
+        onChange={e => setName(e.target.value)}
+        onKeyDown={e => { if (e.key === 'Enter' && canAdd) handleAdd(); if (e.key === 'Escape') onCancel(); }}
+        placeholder="Exercise name..."
+        style={{ width: '100%', background: '#161616', border: `0.5px solid ${B}`, borderRadius: 9, padding: '12px 14px', color: '#fff', fontSize: 15, fontWeight: 600, outline: 'none', marginBottom: 10 }}
+      />
+      {/* Optional details toggle */}
+      {!showDetails ? (
+        <button onClick={() => setShowDetails(true)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.28)', cursor: 'pointer', fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', padding: 0, marginBottom: 12 }}>
+          + ADD DETAILS (OPTIONAL)
+        </button>
+      ) : (
+        <div style={{ marginBottom: 12 }}>
+          {/* Focus area */}
+          <Lbl style={{ marginBottom: 6 }}>WHAT IT TARGETS</Lbl>
+          <input
+            value={focus}
+            onChange={e => setFocus(e.target.value)}
+            placeholder="e.g. Upper chest and front of shoulders"
+            style={{ width: '100%', background: '#161616', border: `0.5px solid ${B}`, borderRadius: 9, padding: '11px 14px', color: '#fff', fontSize: 13, outline: 'none', marginBottom: 12 }}
+          />
+          {/* Equipment */}
+          <Lbl style={{ marginBottom: 8 }}>EQUIPMENT</Lbl>
+          <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
+            {EQUIPMENT_OPTIONS.map(eq => {
+              const e = EQUIP_CONFIG[eq];
+              const active = equipment === eq;
+              return (
+                <button key={eq} onClick={() => setEquipment(active ? null : eq)}
+                  style={{ padding: '6px 12px', background: active ? 'rgba(255,255,255,0.06)' : 'transparent', border: `0.5px solid ${active ? 'rgba(255,255,255,0.18)' : B}`, borderRadius: 7, color: active ? e.text : 'rgba(255,255,255,0.28)', fontSize: 10, fontWeight: 800, cursor: 'pointer', letterSpacing: '0.06em', transition: 'all 0.12s' }}>
+                  {e.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+      {/* Actions */}
+      <div style={{ display: 'flex', gap: 8 }}>
+        <button onClick={onCancel} style={{ padding: '11px 16px', background: 'transparent', border: `0.5px solid ${B}`, borderRadius: 9, fontSize: 11, fontWeight: 700, cursor: 'pointer', color: 'rgba(255,255,255,0.3)', letterSpacing: '0.08em' }}>CANCEL</button>
+        <button onClick={handleAdd} disabled={!canAdd}
+          style={{ flex: 1, padding: '11px 0', background: canAdd ? A : '#111', border: 'none', borderRadius: 9, fontSize: 13, fontWeight: 800, cursor: canAdd ? 'pointer' : 'default', color: canAdd ? '#000' : 'rgba(255,255,255,0.15)', letterSpacing: '0.06em' }}>
+          ADD EXERCISE
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Library Screen ────────────────────────────────────────────────────────── */
 function LibraryScreen({ onBack }: { onBack: () => void }) {
   const [tab, setTab] = useState<'exercises' | 'templates'>('exercises');
-  const [customEx, setCustomEx] = useState(() => DB.get<Record<string, string[]>>('customExercises', {}));
+  const [customEx, setCustomEx] = useState<Record<string, CustomExercise[]>>(() => getCustomExercises());
   const [selPart, setSelPart] = useState('chest');
-  const [newName, setNewName] = useState('');
+  const [adding, setAdding] = useState(false);
   const [templates, setTemplates] = useState(() => getTemplates());
   const [editingTpl, setEditingTpl] = useState<Template | null>(null);
   const [tplName, setTplName] = useState('');
   const [tplPart, setTplPart] = useState('chest');
 
-  const saveCEx = (u: Record<string, string[]>) => { setCustomEx(u); DB.set('customExercises', u); };
+  const saveCEx = (u: Record<string, CustomExercise[]>) => { setCustomEx(u); saveCustomExercises(u); };
   const saveTpls = (u: Template[]) => { setTemplates(u); DB.set('templates', u); };
-  const addEx = () => {
-    const n = newName.trim(); if (!n) return;
-    saveCEx({ ...customEx, [selPart]: [...(customEx[selPart] || []), n] });
-    setNewName('');
+  const addEx = (ex: CustomExercise) => {
+    saveCEx({ ...customEx, [selPart]: [...(customEx[selPart] || []), ex] });
+    setAdding(false);
   };
-  const delEx = (part: string, name: string) => saveCEx({ ...customEx, [part]: (customEx[part] || []).filter(e => e !== name) });
+  const delEx = (part: string, name: string) => saveCEx({ ...customEx, [part]: (customEx[part] || []).filter(e => e.name !== name) });
   const toggleEx = (name: string, bodyPart: string) => {
     if (!editingTpl) return;
     const ex = editingTpl.exercises.find(e => e.name === name);
@@ -123,19 +196,26 @@ function LibraryScreen({ onBack }: { onBack: () => void }) {
 
       {tab === 'exercises' && (
         <div>
+          {/* Body part filter */}
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 16 }}>
             {ALL_PARTS.map(p => (
-              <button key={p.id} onClick={() => setSelPart(p.id)}
+              <button key={p.id} onClick={() => { setSelPart(p.id); setAdding(false); }}
                 style={{ padding: '6px 12px', background: selPart === p.id ? A : 'transparent', border: `0.5px solid ${selPart === p.id ? A : B}`, borderRadius: 7, color: selPart === p.id ? '#000' : 'rgba(255,255,255,0.28)', fontSize: 11, fontWeight: 800, cursor: 'pointer' }}>
                 {p.label.toUpperCase()}
               </button>
             ))}
           </div>
-          <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
-            <input value={newName} onChange={e => setNewName(e.target.value)} onKeyDown={e => e.key === 'Enter' && addEx()} placeholder="Exercise name..."
-              style={{ flex: 1, background: D, border: `0.5px solid ${B}`, borderRadius: 10, padding: '13px 14px', color: '#fff', fontSize: 14, outline: 'none' }} />
-            <button onClick={addEx} style={{ padding: '13px 20px', background: A, border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 800, cursor: 'pointer', color: '#000' }}>ADD</button>
-          </div>
+          {/* Add form or button */}
+          {adding ? (
+            <div style={{ marginBottom: 20 }}>
+              <AddExerciseForm onAdd={addEx} onCancel={() => setAdding(false)} />
+            </div>
+          ) : (
+            <button onClick={() => setAdding(true)} style={{ width: '100%', padding: '13px', background: 'transparent', border: `0.5px solid ${B}`, borderRadius: 10, color: 'rgba(255,255,255,0.35)', cursor: 'pointer', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', marginBottom: 20 }}>
+              + ADD TO {selPart.toUpperCase()}
+            </button>
+          )}
+          {/* Default exercises */}
           <Lbl style={{ marginBottom: 10 }}>DEFAULT</Lbl>
           {(LIBRARY[selPart] || []).map(ex => (
             <div key={ex.name} style={{ padding: '11px 0', borderBottom: `0.5px solid ${B}` }}>
@@ -146,13 +226,22 @@ function LibraryScreen({ onBack }: { onBack: () => void }) {
               <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.22)', lineHeight: 1.4 }}>{ex.focus}</div>
             </div>
           ))}
+          {/* Custom exercises */}
           {(customEx[selPart] || []).length > 0 && (
             <>
               <Lbl style={{ marginTop: 20, marginBottom: 10 }}>YOUR EXERCISES</Lbl>
               {(customEx[selPart] || []).map(ex => (
-                <div key={ex} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '11px 0', borderBottom: `0.5px solid ${B}` }}>
-                  <span style={{ fontSize: 13, color: A, fontWeight: 600 }}>{ex}</span>
-                  <button onClick={() => delEx(selPart, ex)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', cursor: 'pointer', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em' }}>DELETE</button>
+                <div key={ex.name} style={{ padding: '12px 0', borderBottom: `0.5px solid ${B}` }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: ex.focus ? 4 : 0 }}>
+                        <span style={{ fontSize: 13, color: A, fontWeight: 700 }}>{ex.name}</span>
+                        {ex.equipment && <LibEquipBadge type={ex.equipment} />}
+                      </div>
+                      {ex.focus && <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', lineHeight: 1.4 }}>{ex.focus}</div>}
+                    </div>
+                    <button onClick={() => delEx(selPart, ex.name)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.25)', cursor: 'pointer', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', flexShrink: 0, paddingTop: 1 }}>DELETE</button>
+                  </div>
                 </div>
               ))}
             </>
@@ -240,7 +329,7 @@ export default function ConfigScreen({ navigate }: { navigate: (s: ScreenName) =
   const currentKey = keys[provider] || '';
   const hasKey = currentKey.length > 8;
   const tplCount = getTemplates().length;
-  const cxCount = Object.values(DB.get<Record<string, string[]>>('customExercises', {})).reduce((a, v) => a + v.length, 0);
+  const cxCount = Object.values(getCustomExercises()).reduce((a, v) => a + v.length, 0);
 
   return (
     <div style={{ minHeight: '100svh', padding: '52px 28px 40px', background: '#000', display: 'flex', flexDirection: 'column' }}>

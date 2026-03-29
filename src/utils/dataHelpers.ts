@@ -1,15 +1,36 @@
 import { DB } from './db';
 import { LIBRARY, DEFAULT_TEMPLATES, EXERCISE_MAP } from '../constants/exercises';
-import type { Session, Template, HistoryEntry, LoggedSet, ExerciseInfo } from '../types';
+import type { Session, Template, HistoryEntry, LoggedSet, ExerciseInfo, CustomExercise } from '../types';
 
-export function getExercises(id: string): string[] {
-  const c = DB.get<Record<string, string[]>>('customExercises', {});
-  const builtIn = (LIBRARY[id] || []).map(e => e.name);
-  return [...builtIn, ...(c[id] || [])];
+/** Read custom exercises, migrating old string[] entries to CustomExercise[] */
+export function getCustomExercises(): Record<string, CustomExercise[]> {
+  const raw = DB.get<Record<string, (string | CustomExercise)[]>>('customExercises', {});
+  const migrated: Record<string, CustomExercise[]> = {};
+  for (const [part, list] of Object.entries(raw)) {
+    migrated[part] = list.map(e => typeof e === 'string' ? { name: e } : e);
+  }
+  return migrated;
 }
 
-export function getExerciseInfo(name: string): ExerciseInfo | null {
-  return EXERCISE_MAP[name] ?? null;
+export function saveCustomExercises(data: Record<string, CustomExercise[]>): void {
+  DB.set('customExercises', data);
+}
+
+export function getExercises(id: string): string[] {
+  const c = getCustomExercises();
+  const builtIn = (LIBRARY[id] || []).map(e => e.name);
+  return [...builtIn, ...(c[id] || []).map(e => e.name)];
+}
+
+export function getExerciseInfo(name: string): ExerciseInfo | CustomExercise | null {
+  if (EXERCISE_MAP[name]) return EXERCISE_MAP[name];
+  // Search custom exercises
+  const all = getCustomExercises();
+  for (const list of Object.values(all)) {
+    const found = list.find(e => e.name === name);
+    if (found) return found;
+  }
+  return null;
 }
 
 export function getHistory(name: string, n = 3): HistoryEntry[] {

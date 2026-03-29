@@ -12,6 +12,12 @@ export interface ExerciseInfo {
   equipment: EquipmentType;
 }
 
+export interface CustomExercise {
+  name: string;
+  focus?: string;
+  equipment?: EquipmentType;
+}
+
 export interface BodyPart {
   id: string;
   label: string;

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { A, D, B, M, BG } from '../../constants/theme';
 import { DB } from '../../utils/db';
 import { haptic } from '../../utils/haptics';
-import { getExercises, getExerciseInfo, getHistory, getPR, getTemplates, saveSession } from '../../utils/dataHelpers';
+import { getExercises, getExerciseInfo, getCustomExercises, saveCustomExercises, getHistory, getPR, getTemplates, saveSession } from '../../utils/dataHelpers';
 import type { EquipmentType } from '../../types';
 import { Back, Lbl, BigTitle } from '../../components/shared';
 import RepWheel from '../../components/ui/RepWheel';
@@ -31,6 +31,69 @@ function EquipBadge({ type }: { type: EquipmentType }) {
     <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.08em', background: e.bg, color: e.text, padding: '3px 7px', borderRadius: 5, flexShrink: 0 }}>
       {e.label}
     </span>
+  );
+}
+
+const EQUIPMENT_OPTIONS: EquipmentType[] = ['Barbell', 'Dumbbell', 'Cable', 'Machine', 'Bodyweight'];
+const EQUIP_LABELS: Record<EquipmentType, string> = { Barbell: 'BARBELL', Dumbbell: 'DUMBBELL', Cable: 'CABLE', Machine: 'MACHINE', Bodyweight: 'BW' };
+
+function InlineAddExerciseForm({ bodyPartId, onAdd, onCancel }: {
+  bodyPartId: string;
+  onAdd: () => void;
+  onCancel: () => void;
+}) {
+  const [name, setName] = useState('');
+  const [focus, setFocus] = useState('');
+  const [equipment, setEquipment] = useState<EquipmentType | null>(null);
+  const [showDetails, setShowDetails] = useState(false);
+
+  const canAdd = name.trim().length > 0;
+  const handleAdd = () => {
+    if (!canAdd) return;
+    const c = getCustomExercises();
+    saveCustomExercises({ ...c, [bodyPartId]: [...(c[bodyPartId] || []), { name: name.trim(), focus: focus.trim() || undefined, equipment: equipment ?? undefined }] });
+    onAdd();
+  };
+
+  return (
+    <div style={{ background: '#0A0A0A', border: `0.5px solid ${B}`, borderRadius: 14, padding: '16px', marginTop: 4, animation: 'fadeIn 0.15s ease-out both' }}>
+      <Lbl style={{ marginBottom: 10 }}>NEW EXERCISE</Lbl>
+      <input autoFocus value={name} onChange={e => setName(e.target.value)}
+        onKeyDown={e => { if (e.key === 'Enter' && canAdd) handleAdd(); if (e.key === 'Escape') onCancel(); }}
+        placeholder="Exercise name..."
+        style={{ width: '100%', background: '#161616', border: `0.5px solid ${B}`, borderRadius: 9, padding: '12px 14px', color: '#fff', fontSize: 14, fontWeight: 600, outline: 'none', marginBottom: 10 }} />
+      {!showDetails ? (
+        <button onClick={() => setShowDetails(true)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.28)', cursor: 'pointer', fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', padding: 0, marginBottom: 12 }}>
+          + ADD DETAILS (OPTIONAL)
+        </button>
+      ) : (
+        <div style={{ marginBottom: 12 }}>
+          <Lbl style={{ marginBottom: 6 }}>WHAT IT TARGETS</Lbl>
+          <input value={focus} onChange={e => setFocus(e.target.value)} placeholder="e.g. Upper chest and front of shoulders"
+            style={{ width: '100%', background: '#161616', border: `0.5px solid ${B}`, borderRadius: 9, padding: '11px 14px', color: '#fff', fontSize: 13, outline: 'none', marginBottom: 12 }} />
+          <Lbl style={{ marginBottom: 8 }}>EQUIPMENT</Lbl>
+          <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
+            {EQUIPMENT_OPTIONS.map(eq => {
+              const active = equipment === eq;
+              const color = EQUIP[eq].text;
+              return (
+                <button key={eq} onClick={() => setEquipment(active ? null : eq)}
+                  style={{ padding: '6px 12px', background: active ? EQUIP[eq].bg : 'transparent', border: `0.5px solid ${active ? 'rgba(255,255,255,0.12)' : B}`, borderRadius: 7, color: active ? color : 'rgba(255,255,255,0.28)', fontSize: 10, fontWeight: 800, cursor: 'pointer', letterSpacing: '0.06em' }}>
+                  {EQUIP_LABELS[eq]}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+      <div style={{ display: 'flex', gap: 8 }}>
+        <button onClick={onCancel} style={{ padding: '11px 16px', background: 'transparent', border: `0.5px solid ${B}`, borderRadius: 9, fontSize: 11, fontWeight: 700, cursor: 'pointer', color: 'rgba(255,255,255,0.3)', letterSpacing: '0.08em' }}>CANCEL</button>
+        <button onClick={handleAdd} disabled={!canAdd}
+          style={{ flex: 1, padding: '11px 0', background: canAdd ? A : '#111', border: 'none', borderRadius: 9, fontSize: 13, fontWeight: 800, cursor: canAdd ? 'pointer' : 'default', color: canAdd ? '#000' : 'rgba(255,255,255,0.15)' }}>
+          ADD EXERCISE
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -162,15 +225,7 @@ function ExerciseScreen({ bodyPartId, onSelect, onBack, onSwitchMuscle, restEnds
   const [allExercises, setAllExercises] = useState(() => getExercises(bodyPartId));
   const [search, setSearch] = useState('');
   const [adding, setAdding] = useState(false);
-  const [newName, setNewName] = useState('');
   const exercises = search.trim() ? allExercises.filter(e => e.toLowerCase().includes(search.toLowerCase())) : allExercises;
-
-  const addExercise = () => {
-    const n = newName.trim(); if (!n) return;
-    const c = DB.get<Record<string, string[]>>('customExercises', {});
-    DB.set('customExercises', { ...c, [bodyPartId]: [...(c[bodyPartId] || []), n] });
-    setAllExercises(getExercises(bodyPartId)); setNewName(''); setAdding(false);
-  };
 
   return (
     <div style={{ minHeight: '100svh', display: 'flex', flexDirection: 'column', background: BG, animation: 'fadeIn 0.2s ease-out both' }}>
@@ -210,7 +265,7 @@ function ExerciseScreen({ bodyPartId, onSelect, onBack, onSwitchMuscle, restEnds
                 {/* Name row + equipment badge */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: info ? 4 : (lastTopW ? 5 : 0) }}>
                   <span style={{ fontSize: 15, fontWeight: 700, color: '#fff', lineHeight: 1.2 }}>{ex}</span>
-                  {info && <EquipBadge type={info.equipment} />}
+                  {info?.equipment && <EquipBadge type={info.equipment} />}
                 </div>
                 {/* Focus area */}
                 {info && (
@@ -244,15 +299,11 @@ function ExerciseScreen({ bodyPartId, onSelect, onBack, onSwitchMuscle, restEnds
           </button>
         )}
         {adding && (
-          <div style={{ background: D, border: `0.5px solid ${B}`, borderRadius: 12, padding: '16px', marginTop: 4 }}>
-            <Lbl style={{ marginBottom: 10 }}>NEW EXERCISE</Lbl>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <input autoFocus value={newName} onChange={e => setNewName(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') addExercise(); if (e.key === 'Escape') setAdding(false); }} placeholder="Exercise name..."
-                style={{ flex: 1, background: '#0C0C0C', border: `0.5px solid ${B}`, borderRadius: 8, padding: '12px 14px', color: '#fff', fontSize: 14, fontWeight: 600, outline: 'none' }} />
-              <button onClick={addExercise} style={{ padding: '12px 18px', background: newName.trim() ? A : '#161616', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', color: newName.trim() ? '#000' : 'rgba(255,255,255,0.2)', flexShrink: 0 }}>ADD</button>
-            </div>
-            <button onClick={() => { setAdding(false); setNewName(''); }} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', cursor: 'pointer', fontSize: 10, marginTop: 10, letterSpacing: '0.1em', fontWeight: 600 }}>CANCEL</button>
-          </div>
+          <InlineAddExerciseForm
+            bodyPartId={bodyPartId}
+            onAdd={() => { setAllExercises(getExercises(bodyPartId)); setAdding(false); }}
+            onCancel={() => setAdding(false)}
+          />
         )}
       </div>
     </div>
@@ -291,7 +342,7 @@ function TemplateExerciseScreen({ template, sessionSets, onSelect, onSwitchMuscl
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: info ? 4 : 3 }}>
                   <span style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>{ex.name}</span>
-                  {info && <EquipBadge type={info.equipment} />}
+                  {info?.equipment && <EquipBadge type={info.equipment} />}
                 </div>
                 {info && (
                   <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)', marginBottom: 5, lineHeight: 1.4 }}>{info.focus}</div>
