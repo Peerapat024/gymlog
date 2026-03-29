@@ -1,5 +1,5 @@
 import { DB } from './db';
-import { LIBRARY, DEFAULT_TEMPLATES, EXERCISE_MAP, DEFAULT_SPLITS } from '../constants/exercises';
+import { LIBRARY, EXERCISE_MAP, DEFAULT_SPLITS } from '../constants/exercises';
 import type { Session, Template, HistoryEntry, LoggedSet, ExerciseInfo, CustomExercise, TrainingSplit } from '../types';
 
 /** Read custom exercises, migrating old string[] entries to CustomExercise[] */
