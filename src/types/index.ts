@@ -4,6 +4,14 @@ export type BwSign = '+' | '-';
 export type MoodId = 'crushed' | 'solid' | 'meh' | 'rough';
 
 // ─── Exercises ───────────────────────────────────────────────────────────────
+export type EquipmentType = 'Barbell' | 'Dumbbell' | 'Cable' | 'Machine' | 'Bodyweight';
+
+export interface ExerciseInfo {
+  name: string;
+  focus: string;
+  equipment: EquipmentType;
+}
+
 export interface BodyPart {
   id: string;
   label: string;

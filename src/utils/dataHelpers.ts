@@ -1,10 +1,15 @@
 import { DB } from './db';
-import { LIBRARY, DEFAULT_TEMPLATES } from '../constants/exercises';
-import type { Session, Template, HistoryEntry, LoggedSet } from '../types';
+import { LIBRARY, DEFAULT_TEMPLATES, EXERCISE_MAP } from '../constants/exercises';
+import type { Session, Template, HistoryEntry, LoggedSet, ExerciseInfo } from '../types';
 
 export function getExercises(id: string): string[] {
   const c = DB.get<Record<string, string[]>>('customExercises', {});
-  return [...(LIBRARY[id] || []), ...(c[id] || [])];
+  const builtIn = (LIBRARY[id] || []).map(e => e.name);
+  return [...builtIn, ...(c[id] || [])];
+}
+
+export function getExerciseInfo(name: string): ExerciseInfo | null {
+  return EXERCISE_MAP[name] ?? null;
 }
 
 export function getHistory(name: string, n = 3): HistoryEntry[] {

@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { A, D, B, M, BG } from '../../constants/theme';
 import { DB } from '../../utils/db';
 import { haptic } from '../../utils/haptics';
-import { getExercises, getHistory, getPR, getTemplates, saveSession } from '../../utils/dataHelpers';
+import { getExercises, getExerciseInfo, getHistory, getPR, getTemplates, saveSession } from '../../utils/dataHelpers';
+import type { EquipmentType } from '../../types';
 import { Back, Lbl, BigTitle } from '../../components/shared';
 import RepWheel from '../../components/ui/RepWheel';
 import RestBar from '../../components/ui/RestBar';
@@ -14,6 +15,24 @@ import { BW_EXERCISES, DB_EXERCISES, CABLE_EXERCISES } from '../../constants/exe
 import type { ScreenName, LoggedSet, Template, MoodId } from '../../types';
 
 const KG_TO_LBS = 2.20462;
+
+/* ─── Equipment badge ─────────────────────────────────────────────────────── */
+const EQUIP: Record<EquipmentType, { label: string; bg: string; text: string }> = {
+  Barbell:    { label: 'BARBELL',    bg: 'rgba(255,255,255,0.06)', text: 'rgba(255,255,255,0.45)' },
+  Dumbbell:   { label: 'DUMBBELL',   bg: 'rgba(80,160,255,0.1)',   text: 'rgba(110,180,255,0.85)' },
+  Cable:      { label: 'CABLE',      bg: 'rgba(200,255,0,0.08)',   text: 'rgba(200,255,0,0.7)'    },
+  Machine:    { label: 'MACHINE',    bg: 'rgba(180,110,255,0.1)',  text: 'rgba(190,130,255,0.85)' },
+  Bodyweight: { label: 'BW',         bg: 'rgba(255,165,50,0.1)',   text: 'rgba(255,175,60,0.85)'  },
+};
+
+function EquipBadge({ type }: { type: EquipmentType }) {
+  const e = EQUIP[type];
+  return (
+    <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.08em', background: e.bg, color: e.text, padding: '3px 7px', borderRadius: 5, flexShrink: 0 }}>
+      {e.label}
+    </span>
+  );
+}
 
 /* ─── WorkoutStartScreen ──────────────────────────────────────────────────── */
 function WorkoutStartScreen({ sessionSets, onFresh, onTemplate, onFinish }: {
@@ -175,6 +194,7 @@ function ExerciseScreen({ bodyPartId, onSelect, onBack, onSwitchMuscle, restEnds
           <div style={{ padding: '40px 0', textAlign: 'center', fontSize: 11, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.14em' }}>NO MATCHES</div>
         )}
         {exercises.map(ex => {
+          const info = getExerciseInfo(ex);
           const history = getHistory(ex); const pr = getPR(ex);
           const lastSession = history[0] || null;
           const lastTopW = lastSession ? Math.max(...lastSession.sets.map(x => x.weight)) : null;
@@ -184,26 +204,37 @@ function ExerciseScreen({ bodyPartId, onSelect, onBack, onSwitchMuscle, restEnds
             <button
               key={ex}
               onClick={() => { haptic.light(); onSelect(ex); }}
-              style={{ width: '100%', padding: '15px 18px', background: D, border: `0.5px solid ${B}`, borderRadius: 11, cursor: 'pointer', textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+              style={{ width: '100%', padding: '14px 16px', background: D, border: `0.5px solid ${B}`, borderRadius: 11, cursor: 'pointer', textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 }}
             >
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: lastTopW ? 5 : 0 }}>
-                  <span style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>{ex}</span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                {/* Name row + equipment badge */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: info ? 4 : (lastTopW ? 5 : 0) }}>
+                  <span style={{ fontSize: 15, fontWeight: 700, color: '#fff', lineHeight: 1.2 }}>{ex}</span>
+                  {info && <EquipBadge type={info.equipment} />}
+                </div>
+                {/* Focus area */}
+                {info && (
+                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginBottom: lastTopW || pr > 0 ? 6 : 0, lineHeight: 1.4 }}>
+                    {info.focus}
+                  </div>
+                )}
+                {/* History + PR row */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                   {pr > 0 && (
                     <span style={{ fontSize: 9, fontWeight: 800, color: '#000', background: A, padding: '2px 7px', borderRadius: 5, flexShrink: 0 }}>
                       {pr}KG PR
                     </span>
                   )}
+                  {lastTopW && (
+                    <>
+                      <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)', fontWeight: 600 }}>{lastDate}</span>
+                      <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.38)', fontWeight: 700 }}>{lastTopW}kg</span>
+                      <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.22)' }}>{lastSets}s</span>
+                    </>
+                  )}
                 </div>
-                {lastTopW && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', fontWeight: 600 }}>{lastDate}</span>
-                    <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', fontWeight: 700 }}>{lastTopW}kg top</span>
-                    <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)' }}>{lastSets} sets</span>
-                  </div>
-                )}
               </div>
-              <span style={{ fontSize: 18, color: 'rgba(255,255,255,0.2)', marginLeft: 8, flexShrink: 0 }}>›</span>
+              <span style={{ fontSize: 18, color: 'rgba(255,255,255,0.18)', flexShrink: 0, marginTop: 2 }}>›</span>
             </button>
           );
         })}
@@ -253,19 +284,26 @@ function TemplateExerciseScreen({ template, sessionSets, onSelect, onSwitchMuscl
           const cnt = sessionSets.filter(s => s.exercise === ex.name).length;
           const pr = getPR(ex.name);
           const lw = getHistory(ex.name, 1)[0]?.sets?.slice(-1)[0]?.weight;
+          const info = getExerciseInfo(ex.name);
           return (
             <button key={ex.name} onClick={() => { haptic.light(); onSelect(ex.name, ex.bodyPart); }}
-              style={{ padding: '16px 18px', background: D, border: `0.5px solid ${B}`, borderRadius: 11, cursor: 'pointer', textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: cnt >= 4 ? 0.35 : 1 }}>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              style={{ padding: '14px 16px', background: D, border: `0.5px solid ${B}`, borderRadius: 11, cursor: 'pointer', textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10, opacity: cnt >= 4 ? 0.35 : 1 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: info ? 4 : 3 }}>
                   <span style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>{ex.name}</span>
-                  {pr > 0 && <span style={{ fontSize: 9, fontWeight: 800, color: '#000', background: A, padding: '2px 6px', borderRadius: 4 }}>{pr}KG</span>}
+                  {info && <EquipBadge type={info.equipment} />}
                 </div>
-                <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.28)', letterSpacing: '0.1em', marginTop: 3, display: 'block', fontWeight: 700 }}>
-                  {ex.bodyPart.toUpperCase()}{lw ? ` · LAST ${lw}KG` : ''}{cnt > 0 ? ` · ${cnt} SET${cnt !== 1 ? 'S' : ''} DONE` : ''}
-                </span>
+                {info && (
+                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)', marginBottom: 5, lineHeight: 1.4 }}>{info.focus}</div>
+                )}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                  {pr > 0 && <span style={{ fontSize: 9, fontWeight: 800, color: '#000', background: A, padding: '2px 6px', borderRadius: 4 }}>{pr}KG PR</span>}
+                  <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.08em', fontWeight: 700 }}>
+                    {ex.bodyPart.toUpperCase()}{lw ? ` · LAST ${lw}KG` : ''}{cnt > 0 ? ` · ${cnt}S DONE` : ''}
+                  </span>
+                </div>
               </div>
-              <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.2)' }}>→</span>
+              <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.18)', flexShrink: 0, marginTop: 2 }}>→</span>
             </button>
           );
         })}

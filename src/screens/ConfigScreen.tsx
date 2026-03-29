@@ -6,7 +6,21 @@ import { getExercises, getTemplates } from '../utils/dataHelpers';
 import { Back, Lbl, BigTitle, SegmentWrap, SegBtn } from '../components/shared';
 import { PROVIDERS } from '../utils/ai';
 import { LIBRARY, ALL_PARTS } from '../constants/exercises';
+import type { EquipmentType } from '../types';
 import type { ScreenName, AIProvider, Template, WeightUnit } from '../types';
+
+/* ─── Equipment badge (for library screen) ──────────────────────────────────── */
+const EQUIP_CONFIG: Record<EquipmentType, { label: string; text: string }> = {
+  Barbell:    { label: 'BARBELL',  text: 'rgba(255,255,255,0.35)' },
+  Dumbbell:   { label: 'DUMBBELL', text: 'rgba(110,180,255,0.75)' },
+  Cable:      { label: 'CABLE',    text: 'rgba(200,255,0,0.6)'    },
+  Machine:    { label: 'MACHINE',  text: 'rgba(190,130,255,0.75)' },
+  Bodyweight: { label: 'BW',       text: 'rgba(255,175,60,0.75)'  },
+};
+function LibEquipBadge({ type }: { type: EquipmentType }) {
+  const e = EQUIP_CONFIG[type];
+  return <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.06em', color: e.text, flexShrink: 0 }}>{e.label}</span>;
+}
 
 /* ─── Library Screen ────────────────────────────────────────────────────────── */
 function LibraryScreen({ onBack }: { onBack: () => void }) {
@@ -124,7 +138,13 @@ function LibraryScreen({ onBack }: { onBack: () => void }) {
           </div>
           <Lbl style={{ marginBottom: 10 }}>DEFAULT</Lbl>
           {(LIBRARY[selPart] || []).map(ex => (
-            <div key={ex} style={{ padding: '11px 0', borderBottom: `0.5px solid ${B}`, fontSize: 13, color: 'rgba(255,255,255,0.28)' }}>{ex}</div>
+            <div key={ex.name} style={{ padding: '11px 0', borderBottom: `0.5px solid ${B}` }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 3 }}>
+                <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', fontWeight: 600 }}>{ex.name}</span>
+                <LibEquipBadge type={ex.equipment} />
+              </div>
+              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.22)', lineHeight: 1.4 }}>{ex.focus}</div>
+            </div>
           ))}
           {(customEx[selPart] || []).length > 0 && (
             <>
