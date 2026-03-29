@@ -1,4 +1,4 @@
-import type { BodyPart, AllPart, Template, ExerciseInfo } from '../types';
+import type { BodyPart, AllPart, Template, ExerciseInfo, TrainingSplit } from '../types';
 
 // ─── Body part hierarchy (for picker UI) ─────────────────────────────────────
 export const BODY_PARTS: BodyPart[] = [
@@ -227,6 +227,376 @@ export const DEFAULT_TEMPLATES: Template[] = [
       { name: 'Lat Pulldowns',            bodyPart: 'back' },
       { name: 'Barbell Bicep Curls',      bodyPart: 'biceps' },
       { name: 'Tricep Pushdowns',         bodyPart: 'triceps' },
+    ],
+  },
+];
+
+// ─── Training splits ──────────────────────────────────────────────────────────
+export const DEFAULT_SPLITS: TrainingSplit[] = [
+  {
+    id: 'bro',
+    name: 'Bro Split',
+    tag: '5-DAY SPLIT',
+    description: 'One muscle group per day. Maximum volume per session.',
+    days: [
+      {
+        name: 'Chest Day',
+        muscles: 'Chest',
+        exercises: [
+          { name: 'Flat Barbell Bench Press',    bodyPart: 'chest' },
+          { name: 'Incline Dumbbell Bench Press', bodyPart: 'chest' },
+          { name: 'Decline Barbell Bench Press', bodyPart: 'chest' },
+          { name: 'Cable Crossovers',            bodyPart: 'chest' },
+          { name: 'Pec Deck Machine',            bodyPart: 'chest' },
+        ],
+      },
+      {
+        name: 'Back Day',
+        muscles: 'Back',
+        exercises: [
+          { name: 'Deadlift',             bodyPart: 'back' },
+          { name: 'Pull-Ups',             bodyPart: 'back' },
+          { name: 'Barbell Rows',         bodyPart: 'back' },
+          { name: 'Seated Cable Rows',    bodyPart: 'back' },
+          { name: 'Lat Pulldowns',        bodyPart: 'back' },
+        ],
+      },
+      {
+        name: 'Shoulders Day',
+        muscles: 'Shoulders',
+        exercises: [
+          { name: 'Military Press',          bodyPart: 'shoulders' },
+          { name: 'Dumbbell Lateral Raises', bodyPart: 'shoulders' },
+          { name: 'Arnold Press',            bodyPart: 'shoulders' },
+          { name: 'Cable Face Pulls',        bodyPart: 'shoulders' },
+          { name: 'Reverse Pec Deck',        bodyPart: 'shoulders' },
+        ],
+      },
+      {
+        name: 'Legs Day',
+        muscles: 'Quads · Hamstrings · Glutes · Calves',
+        exercises: [
+          { name: 'Barbell Back Squat',   bodyPart: 'legs' },
+          { name: 'Leg Press',            bodyPart: 'legs' },
+          { name: 'Romanian Deadlifts',   bodyPart: 'legs' },
+          { name: 'Lying Leg Curls',      bodyPart: 'legs' },
+          { name: 'Leg Extensions',       bodyPart: 'legs' },
+          { name: 'Standing Calf Raises', bodyPart: 'legs' },
+        ],
+      },
+      {
+        name: 'Arms Day',
+        muscles: 'Biceps · Triceps',
+        exercises: [
+          { name: 'Barbell Bicep Curls',       bodyPart: 'biceps'  },
+          { name: 'Hammer Curls',              bodyPart: 'biceps'  },
+          { name: 'Preacher Curls',            bodyPart: 'biceps'  },
+          { name: 'Tricep Pushdowns',          bodyPart: 'triceps' },
+          { name: 'Skull Crushers',            bodyPart: 'triceps' },
+          { name: 'Overhead Tricep Extension', bodyPart: 'triceps' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'ppl',
+    name: 'Push-Pull-Legs',
+    tag: '3-DAY SPLIT',
+    description: 'Run 3 or 6 days a week. Balanced push and pull volume.',
+    days: [
+      {
+        name: 'Push',
+        muscles: 'Chest · Shoulders · Triceps',
+        exercises: [
+          { name: 'Flat Barbell Bench Press',    bodyPart: 'chest'     },
+          { name: 'Incline Dumbbell Bench Press', bodyPart: 'chest'    },
+          { name: 'Military Press',              bodyPart: 'shoulders' },
+          { name: 'Dumbbell Lateral Raises',     bodyPart: 'shoulders' },
+          { name: 'Tricep Pushdowns',            bodyPart: 'triceps'   },
+          { name: 'Skull Crushers',              bodyPart: 'triceps'   },
+        ],
+      },
+      {
+        name: 'Pull',
+        muscles: 'Back · Biceps',
+        exercises: [
+          { name: 'Deadlift',            bodyPart: 'back'    },
+          { name: 'Pull-Ups',            bodyPart: 'back'    },
+          { name: 'Barbell Rows',        bodyPart: 'back'    },
+          { name: 'Lat Pulldowns',       bodyPart: 'back'    },
+          { name: 'Barbell Bicep Curls', bodyPart: 'biceps'  },
+          { name: 'Hammer Curls',        bodyPart: 'biceps'  },
+        ],
+      },
+      {
+        name: 'Legs',
+        muscles: 'Quads · Hamstrings · Glutes · Calves',
+        exercises: [
+          { name: 'Barbell Back Squat',   bodyPart: 'legs' },
+          { name: 'Leg Press',            bodyPart: 'legs' },
+          { name: 'Romanian Deadlifts',   bodyPart: 'legs' },
+          { name: 'Lying Leg Curls',      bodyPart: 'legs' },
+          { name: 'Leg Extensions',       bodyPart: 'legs' },
+          { name: 'Standing Calf Raises', bodyPart: 'legs' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'upper_lower',
+    name: 'Upper-Lower',
+    tag: '4-DAY SPLIT',
+    description: 'Each muscle hit twice a week. Great for strength and size.',
+    days: [
+      {
+        name: 'Upper A',
+        muscles: 'Chest · Back · Shoulders · Arms',
+        exercises: [
+          { name: 'Flat Barbell Bench Press', bodyPart: 'chest'     },
+          { name: 'Barbell Rows',             bodyPart: 'back'      },
+          { name: 'Military Press',           bodyPart: 'shoulders' },
+          { name: 'Pull-Ups',                 bodyPart: 'back'      },
+          { name: 'Barbell Bicep Curls',      bodyPart: 'biceps'    },
+          { name: 'Tricep Pushdowns',         bodyPart: 'triceps'   },
+        ],
+      },
+      {
+        name: 'Lower A',
+        muscles: 'Quads · Hamstrings · Glutes · Calves',
+        exercises: [
+          { name: 'Barbell Back Squat',   bodyPart: 'legs' },
+          { name: 'Romanian Deadlifts',   bodyPart: 'legs' },
+          { name: 'Leg Press',            bodyPart: 'legs' },
+          { name: 'Lying Leg Curls',      bodyPart: 'legs' },
+          { name: 'Standing Calf Raises', bodyPart: 'legs' },
+        ],
+      },
+      {
+        name: 'Upper B',
+        muscles: 'Chest · Back · Shoulders · Arms',
+        exercises: [
+          { name: 'Incline Dumbbell Bench Press', bodyPart: 'chest'     },
+          { name: 'Seated Cable Rows',            bodyPart: 'back'      },
+          { name: 'Arnold Press',                 bodyPart: 'shoulders' },
+          { name: 'Lat Pulldowns',                bodyPart: 'back'      },
+          { name: 'Hammer Curls',                 bodyPart: 'biceps'    },
+          { name: 'Skull Crushers',               bodyPart: 'triceps'   },
+        ],
+      },
+      {
+        name: 'Lower B',
+        muscles: 'Posterior chain focus',
+        exercises: [
+          { name: 'Deadlift',              bodyPart: 'legs' },
+          { name: 'Hip Thrusts',           bodyPart: 'legs' },
+          { name: 'Bulgarian Split Squats', bodyPart: 'legs' },
+          { name: 'Seated Leg Curls',      bodyPart: 'legs' },
+          { name: 'Leg Extensions',        bodyPart: 'legs' },
+          { name: 'Seated Calf Raises',    bodyPart: 'legs' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'full_body',
+    name: 'Full Body',
+    tag: '3-DAY SPLIT',
+    description: 'Train every muscle every session. Best for beginners and athletes.',
+    days: [
+      {
+        name: 'Full Body A',
+        muscles: 'Full body',
+        exercises: [
+          { name: 'Flat Barbell Bench Press', bodyPart: 'chest'     },
+          { name: 'Barbell Rows',             bodyPart: 'back'      },
+          { name: 'Barbell Back Squat',       bodyPart: 'legs'      },
+          { name: 'Military Press',           bodyPart: 'shoulders' },
+          { name: 'Barbell Bicep Curls',      bodyPart: 'biceps'    },
+          { name: 'Tricep Pushdowns',         bodyPart: 'triceps'   },
+        ],
+      },
+      {
+        name: 'Full Body B',
+        muscles: 'Full body',
+        exercises: [
+          { name: 'Incline Dumbbell Bench Press', bodyPart: 'chest'     },
+          { name: 'Pull-Ups',                     bodyPart: 'back'      },
+          { name: 'Romanian Deadlifts',           bodyPart: 'legs'      },
+          { name: 'Dumbbell Lateral Raises',      bodyPart: 'shoulders' },
+          { name: 'Hammer Curls',                 bodyPart: 'biceps'    },
+          { name: 'Skull Crushers',               bodyPart: 'triceps'   },
+        ],
+      },
+      {
+        name: 'Full Body C',
+        muscles: 'Full body',
+        exercises: [
+          { name: 'Chest Dips',          bodyPart: 'chest'     },
+          { name: 'Seated Cable Rows',   bodyPart: 'back'      },
+          { name: 'Leg Press',           bodyPart: 'legs'      },
+          { name: 'Arnold Press',        bodyPart: 'shoulders' },
+          { name: 'Cable Bicep Curls',   bodyPart: 'biceps'    },
+          { name: 'Rope Pushdowns',      bodyPart: 'triceps'   },
+          { name: 'Standing Calf Raises', bodyPart: 'legs'     },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'arnold',
+    name: 'Arnold Split',
+    tag: '6-DAY SPLIT',
+    description: 'The bodybuilder\'s 3-day cycle run twice per week. High volume.',
+    days: [
+      {
+        name: 'Chest & Back',
+        muscles: 'Chest · Back',
+        exercises: [
+          { name: 'Flat Barbell Bench Press',    bodyPart: 'chest' },
+          { name: 'Incline Barbell Bench Press', bodyPart: 'chest' },
+          { name: 'Deadlift',                    bodyPart: 'back'  },
+          { name: 'Pull-Ups',                    bodyPart: 'back'  },
+          { name: 'Barbell Rows',                bodyPart: 'back'  },
+          { name: 'Cable Crossovers',            bodyPart: 'chest' },
+        ],
+      },
+      {
+        name: 'Shoulders & Arms',
+        muscles: 'Shoulders · Biceps · Triceps',
+        exercises: [
+          { name: 'Military Press',            bodyPart: 'shoulders' },
+          { name: 'Dumbbell Lateral Raises',   bodyPart: 'shoulders' },
+          { name: 'Arnold Press',              bodyPart: 'shoulders' },
+          { name: 'Barbell Bicep Curls',       bodyPart: 'biceps'    },
+          { name: 'Hammer Curls',              bodyPart: 'biceps'    },
+          { name: 'Skull Crushers',            bodyPart: 'triceps'   },
+          { name: 'Tricep Pushdowns',          bodyPart: 'triceps'   },
+        ],
+      },
+      {
+        name: 'Legs',
+        muscles: 'Quads · Hamstrings · Glutes · Calves',
+        exercises: [
+          { name: 'Barbell Back Squat',   bodyPart: 'legs' },
+          { name: 'Leg Press',            bodyPart: 'legs' },
+          { name: 'Romanian Deadlifts',   bodyPart: 'legs' },
+          { name: 'Lying Leg Curls',      bodyPart: 'legs' },
+          { name: 'Leg Extensions',       bodyPart: 'legs' },
+          { name: 'Standing Calf Raises', bodyPart: 'legs' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'powerlifting',
+    name: 'Powerlifting',
+    tag: '4-DAY SPLIT',
+    description: 'Built around the big three. Strength first, hypertrophy second.',
+    days: [
+      {
+        name: 'Squat Day',
+        muscles: 'Quads · Glutes · Lower back',
+        exercises: [
+          { name: 'Barbell Back Squat',   bodyPart: 'legs' },
+          { name: 'Romanian Deadlifts',   bodyPart: 'legs' },
+          { name: 'Leg Press',            bodyPart: 'legs' },
+          { name: 'Lying Leg Curls',      bodyPart: 'legs' },
+          { name: 'Back Extensions',      bodyPart: 'back' },
+          { name: 'Standing Calf Raises', bodyPart: 'legs' },
+        ],
+      },
+      {
+        name: 'Bench Day',
+        muscles: 'Chest · Shoulders · Triceps',
+        exercises: [
+          { name: 'Flat Barbell Bench Press',  bodyPart: 'chest'     },
+          { name: 'Close-Grip Bench Press',    bodyPart: 'triceps'   },
+          { name: 'Incline Dumbbell Bench Press', bodyPart: 'chest'  },
+          { name: 'Dumbbell Lateral Raises',   bodyPart: 'shoulders' },
+          { name: 'Tricep Pushdowns',          bodyPart: 'triceps'   },
+          { name: 'Cable Face Pulls',          bodyPart: 'shoulders' },
+        ],
+      },
+      {
+        name: 'Deadlift Day',
+        muscles: 'Back · Hamstrings · Traps',
+        exercises: [
+          { name: 'Deadlift',             bodyPart: 'back' },
+          { name: 'Pull-Ups',             bodyPart: 'back' },
+          { name: 'Barbell Rows',         bodyPart: 'back' },
+          { name: 'T-Bar Rows',           bodyPart: 'back' },
+          { name: 'Shrugs',               bodyPart: 'back' },
+          { name: 'Seated Cable Rows',    bodyPart: 'back' },
+        ],
+      },
+      {
+        name: 'Accessory Day',
+        muscles: 'Weak points · Arms · Core',
+        exercises: [
+          { name: 'Incline Dumbbell Bench Press', bodyPart: 'chest'   },
+          { name: 'Lat Pulldowns',               bodyPart: 'back'     },
+          { name: 'Hip Thrusts',                 bodyPart: 'legs'     },
+          { name: 'Barbell Bicep Curls',         bodyPart: 'biceps'   },
+          { name: 'Skull Crushers',              bodyPart: 'triceps'  },
+          { name: 'Cable Crunch',                bodyPart: 'core'     },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'phul',
+    name: 'PHUL',
+    tag: '4-DAY SPLIT',
+    description: 'Power + Hypertrophy Upper Lower. The best of strength and size.',
+    days: [
+      {
+        name: 'Upper Power',
+        muscles: 'Chest · Back · Shoulders · Arms',
+        exercises: [
+          { name: 'Flat Barbell Bench Press', bodyPart: 'chest'     },
+          { name: 'Barbell Rows',             bodyPart: 'back'      },
+          { name: 'Military Press',           bodyPart: 'shoulders' },
+          { name: 'Pull-Ups',                 bodyPart: 'back'      },
+          { name: 'Close-Grip Bench Press',   bodyPart: 'triceps'   },
+          { name: 'Barbell Bicep Curls',      bodyPart: 'biceps'    },
+        ],
+      },
+      {
+        name: 'Lower Power',
+        muscles: 'Quads · Hamstrings · Glutes',
+        exercises: [
+          { name: 'Barbell Back Squat',   bodyPart: 'legs' },
+          { name: 'Deadlift',             bodyPart: 'legs' },
+          { name: 'Leg Press',            bodyPart: 'legs' },
+          { name: 'Romanian Deadlifts',   bodyPart: 'legs' },
+          { name: 'Standing Calf Raises', bodyPart: 'legs' },
+        ],
+      },
+      {
+        name: 'Upper Hypertrophy',
+        muscles: 'Chest · Back · Shoulders · Arms',
+        exercises: [
+          { name: 'Incline Dumbbell Bench Press', bodyPart: 'chest'     },
+          { name: 'Seated Cable Rows',            bodyPart: 'back'      },
+          { name: 'Dumbbell Lateral Raises',      bodyPart: 'shoulders' },
+          { name: 'Lat Pulldowns',                bodyPart: 'back'      },
+          { name: 'Hammer Curls',                 bodyPart: 'biceps'    },
+          { name: 'Skull Crushers',               bodyPart: 'triceps'   },
+          { name: 'Cable Face Pulls',             bodyPart: 'shoulders' },
+        ],
+      },
+      {
+        name: 'Lower Hypertrophy',
+        muscles: 'Posterior chain · Quads · Calves',
+        exercises: [
+          { name: 'Romanian Deadlifts',    bodyPart: 'legs' },
+          { name: 'Bulgarian Split Squats', bodyPart: 'legs' },
+          { name: 'Leg Extensions',        bodyPart: 'legs' },
+          { name: 'Lying Leg Curls',       bodyPart: 'legs' },
+          { name: 'Hip Thrusts',           bodyPart: 'legs' },
+          { name: 'Seated Calf Raises',    bodyPart: 'legs' },
+        ],
+      },
     ],
   },
 ];

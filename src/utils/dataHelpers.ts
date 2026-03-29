@@ -1,6 +1,6 @@
 import { DB } from './db';
-import { LIBRARY, DEFAULT_TEMPLATES, EXERCISE_MAP } from '../constants/exercises';
-import type { Session, Template, HistoryEntry, LoggedSet, ExerciseInfo, CustomExercise } from '../types';
+import { LIBRARY, DEFAULT_TEMPLATES, EXERCISE_MAP, DEFAULT_SPLITS } from '../constants/exercises';
+import type { Session, Template, HistoryEntry, LoggedSet, ExerciseInfo, CustomExercise, TrainingSplit } from '../types';
 
 /** Read custom exercises, migrating old string[] entries to CustomExercise[] */
 export function getCustomExercises(): Record<string, CustomExercise[]> {
@@ -53,6 +53,17 @@ export function getPR(name: string): number {
 export function getTemplates(): Template[] {
   const s = DB.get<Template[] | null>('templates', null);
   return s !== null ? s : DEFAULT_TEMPLATES;
+}
+
+export function getSplits(): TrainingSplit[] {
+  const custom = DB.get<TrainingSplit[] | null>('customSplits', null);
+  return custom ? [...DEFAULT_SPLITS, ...custom] : DEFAULT_SPLITS;
+}
+
+export function saveSplits(splits: TrainingSplit[]): void {
+  // Only save the user-created splits (not defaults)
+  const customOnly = splits.filter(s => !DEFAULT_SPLITS.find(d => d.id === s.id));
+  DB.set('customSplits', customOnly);
 }
 
 export function saveSession(sets: LoggedSet[], startTime: number, note?: string): void {

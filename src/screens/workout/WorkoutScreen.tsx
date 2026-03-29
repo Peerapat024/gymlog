@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { A, D, B, M, BG } from '../../constants/theme';
 import { DB } from '../../utils/db';
 import { haptic } from '../../utils/haptics';
-import { getExercises, getExerciseInfo, getCustomExercises, saveCustomExercises, getHistory, getPR, getTemplates, saveSession } from '../../utils/dataHelpers';
+import { getExercises, getExerciseInfo, getCustomExercises, saveCustomExercises, getHistory, getPR, getTemplates, getSplits, saveSession } from '../../utils/dataHelpers';
 import type { EquipmentType } from '../../types';
 import { Back, Lbl, BigTitle } from '../../components/shared';
 import RepWheel from '../../components/ui/RepWheel';
@@ -12,7 +12,7 @@ import ConfirmEnd from '../../components/ui/ConfirmEnd';
 import MoodCharacter from '../../components/ui/MoodCharacter';
 import { BODY_PARTS } from '../../constants/exercises';
 import { BW_EXERCISES, DB_EXERCISES, CABLE_EXERCISES } from '../../constants/exercises';
-import type { ScreenName, LoggedSet, Template, MoodId } from '../../types';
+import type { ScreenName, LoggedSet, Template, MoodId, TrainingSplit } from '../../types';
 
 const KG_TO_LBS = 2.20462;
 
@@ -97,6 +97,48 @@ function InlineAddExerciseForm({ bodyPartId, onAdd, onCancel }: {
   );
 }
 
+/* ─── SplitCard ───────────────────────────────────────────────────────────── */
+function SplitCard({ split, onSelectDay }: { split: TrainingSplit; onSelectDay: (split: TrainingSplit, dayIdx: number) => void }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ borderRadius: 14, border: `0.5px solid ${B}`, overflow: 'hidden', background: D }}>
+      {/* Header row */}
+      <button
+        onClick={() => { haptic.light(); setOpen(o => !o); }}
+        style={{ width: '100%', padding: '20px 22px', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+      >
+        <div style={{ textAlign: 'left' }}>
+          <div style={{ fontSize: 18, fontWeight: 900, color: '#fff', letterSpacing: '-0.01em', lineHeight: 1.1 }}>{split.name.toUpperCase()}</div>
+          <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.28)', letterSpacing: '0.18em', fontWeight: 700, marginTop: 4 }}>{split.tag}</div>
+        </div>
+        <span style={{ fontSize: 13, color: open ? A : 'rgba(255,255,255,0.25)', display: 'inline-block', transform: open ? 'rotate(90deg)' : 'none', transition: 'transform 0.22s ease, color 0.18s ease', fontWeight: 700 }}>›</span>
+      </button>
+
+      {/* Description + days */}
+      {open && (
+        <div style={{ borderTop: `0.5px solid ${B}`, animation: 'fadeIn 0.15s ease-out both' }}>
+          {split.description && (
+            <p style={{ margin: 0, padding: '12px 22px 8px', fontSize: 12, color: 'rgba(255,255,255,0.35)', lineHeight: 1.5, fontWeight: 500 }}>{split.description}</p>
+          )}
+          {split.days.map((day, idx) => (
+            <button
+              key={idx}
+              onClick={() => { haptic.medium(); onSelectDay(split, idx); }}
+              style={{ width: '100%', padding: '14px 22px', background: 'transparent', border: 'none', borderTop: idx === 0 ? `0.5px solid ${B}` : 'none', borderBottom: idx < split.days.length - 1 ? `0.5px solid rgba(255,255,255,0.04)` : 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}
+            >
+              <div style={{ textAlign: 'left', flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: '#fff', letterSpacing: '0.04em', marginBottom: 3 }}>{day.name.toUpperCase()}</div>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{day.muscles}</div>
+              </div>
+              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.2)', fontWeight: 700, flexShrink: 0 }}>›</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ─── WorkoutStartScreen ──────────────────────────────────────────────────── */
 function WorkoutStartScreen({ sessionSets, onFresh, onTemplate, onFinish }: {
   sessionSets: LoggedSet[];
@@ -104,8 +146,19 @@ function WorkoutStartScreen({ sessionSets, onFresh, onTemplate, onFinish }: {
   onTemplate: (tpl: Template) => void;
   onFinish: () => void;
 }) {
-  const templates = getTemplates();
+  const splits = getSplits();
+  const userTemplates = getTemplates().filter(t => !t.id.startsWith('default-'));
   const inSession = sessionSets.length > 0;
+
+  const handleSelectDay = (split: TrainingSplit, dayIdx: number) => {
+    const day = split.days[dayIdx];
+    onTemplate({
+      id: `split-${split.id}-${dayIdx}`,
+      name: `${split.name} · ${day.name}`,
+      exercises: day.exercises,
+    });
+  };
+
   return (
     <div style={{ minHeight: '100svh', display: 'flex', flexDirection: 'column', background: BG, animation: 'fadeIn 0.2s ease-out both' }}>
       <div style={{ padding: '52px 28px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -118,21 +171,36 @@ function WorkoutStartScreen({ sessionSets, onFresh, onTemplate, onFinish }: {
         <Lbl>WORKOUT</Lbl>
         <BigTitle>{inSession ? 'WHAT NEXT?' : "LET'S GO."}</BigTitle>
       </div>
+
       <div style={{ flex: 1, padding: '8px 20px', paddingBottom: 'max(140px,calc(env(safe-area-inset-bottom)+110px))', display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <button onClick={onFresh} style={{ padding: '26px 22px', background: A, border: 'none', borderRadius: 14, color: '#000', cursor: 'pointer', textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'transform 0.1s' }}>
+        {/* Start fresh */}
+        <button onClick={onFresh} style={{ padding: '26px 22px', background: A, border: 'none', borderRadius: 14, color: '#000', cursor: 'pointer', textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-0.01em' }}>{inSession ? 'SWITCH MUSCLE GROUP' : 'START FRESH'}</div>
             <div style={{ fontSize: 10, color: 'rgba(0,0,0,0.45)', marginTop: 5, letterSpacing: '0.12em', fontWeight: 700 }}>PICK ANY MUSCLE GROUP</div>
           </div>
           <span style={{ fontSize: 20, fontWeight: 700 }}>→</span>
         </button>
-        {templates.length > 0 && (<>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '6px 4px' }}>
+
+        {/* Splits */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 4px 2px' }}>
+          <div style={{ flex: 1, height: '0.5px', background: B }} />
+          <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.2em', fontWeight: 700 }}>TRAINING SPLITS</span>
+          <div style={{ flex: 1, height: '0.5px', background: B }} />
+        </div>
+
+        {splits.map(split => (
+          <SplitCard key={split.id} split={split} onSelectDay={handleSelectDay} />
+        ))}
+
+        {/* User's custom templates */}
+        {userTemplates.length > 0 && (<>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 4px 2px' }}>
             <div style={{ flex: 1, height: '0.5px', background: B }} />
-            <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.2em', fontWeight: 700 }}>OR USE TEMPLATE</span>
+            <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.2em', fontWeight: 700 }}>MY TEMPLATES</span>
             <div style={{ flex: 1, height: '0.5px', background: B }} />
           </div>
-          {templates.map(tpl => (
+          {userTemplates.map(tpl => (
             <button key={tpl.id} onClick={() => { haptic.light(); onTemplate(tpl); }} style={{ padding: '18px 22px', background: D, border: `0.5px solid ${B}`, borderRadius: 12, color: '#fff', cursor: 'pointer', textAlign: 'left' }}>
               <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: '-0.01em', marginBottom: 8 }}>{tpl.name.toUpperCase()}</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>

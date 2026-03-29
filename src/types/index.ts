@@ -18,6 +18,21 @@ export interface CustomExercise {
   equipment?: EquipmentType;
 }
 
+// ─── Training splits ─────────────────────────────────────────────────────────
+export interface SplitDay {
+  name: string;
+  muscles: string;            // e.g. "Chest · Shoulders · Triceps"
+  exercises: TemplateExercise[];
+}
+
+export interface TrainingSplit {
+  id: string;
+  name: string;
+  tag: string;                // e.g. "5-DAY SPLIT"
+  description: string;
+  days: SplitDay[];
+}
+
 export interface BodyPart {
   id: string;
   label: string;
