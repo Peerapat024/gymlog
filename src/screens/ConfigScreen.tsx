@@ -270,8 +270,10 @@ function LibraryScreen({ onBack }: { onBack: () => void }) {
                 <div style={{ display: 'flex', gap: 10 }}>
                   <button onClick={() => { setEditingTpl({ ...tpl, exercises: [...tpl.exercises] }); setTplName(tpl.name); setTplNameError(''); }}
                     style={{ background: 'none', border: `0.5px solid ${B}`, borderRadius: 6, padding: '5px 10px', color: M, cursor: 'pointer', fontSize: 10, fontWeight: 700 }}>EDIT</button>
-                  <button onClick={() => saveTpls(templates.filter(t => t.id !== tpl.id))}
-                    style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', cursor: 'pointer', fontSize: 10, fontWeight: 700 }}>DELETE</button>
+                  {!tpl.id.startsWith('split-') && (
+                    <button onClick={() => saveTpls(templates.filter(t => t.id !== tpl.id))}
+                      style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', cursor: 'pointer', fontSize: 10, fontWeight: 700 }}>DELETE</button>
+                  )}
                 </div>
               </div>
               <div style={{ padding: '0 16px 12px', display: 'flex', flexWrap: 'wrap', gap: 5 }}>
