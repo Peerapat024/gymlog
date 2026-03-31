@@ -1,5 +1,5 @@
 import { DB } from './db';
-import { LIBRARY, EXERCISE_MAP, DEFAULT_SPLITS } from '../constants/exercises';
+import { LIBRARY, EXERCISE_MAP, DEFAULT_SPLITS, DEFAULT_TEMPLATES } from '../constants/exercises';
 import type { Session, Template, HistoryEntry, LoggedSet, ExerciseInfo, CustomExercise, TrainingSplit } from '../types';
 
 /** Read custom exercises, migrating old string[] entries to CustomExercise[] */
@@ -51,21 +51,11 @@ export function getPR(name: string): number {
 }
 
 export function getTemplates(): Template[] {
-  const s = DB.get<Template[] | null>('templates', null);
-  if (s !== null) return s;
-  // First launch: seed from all split days, deduplicating by name
-  const seenNames = new Set<string>();
-  const fromSplits: Template[] = [];
-  for (const split of DEFAULT_SPLITS) {
-    for (let i = 0; i < split.days.length; i++) {
-      const day = split.days[i];
-      if (!seenNames.has(day.name)) {
-        seenNames.add(day.name);
-        fromSplits.push({ id: `split-${split.id}-${i}`, name: day.name, exercises: day.exercises });
-      }
-    }
-  }
-  return fromSplits;
+  const stored = DB.get<Template[] | null>('templates', null);
+  const custom = stored || [];
+  // Return default templates + custom templates (defaults always come first)
+  const customNonDefaults = custom.filter(t => !DEFAULT_TEMPLATES.find(d => d.id === t.id));
+  return [...DEFAULT_TEMPLATES, ...customNonDefaults];
 }
 
 export function getSplits(): TrainingSplit[] {
