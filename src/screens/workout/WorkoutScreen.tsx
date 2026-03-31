@@ -15,6 +15,8 @@ import { BODY_PARTS } from '../../constants/exercises';
 import { BW_EXERCISES, DB_EXERCISES, CABLE_EXERCISES } from '../../constants/exercises';
 import type { ScreenName, LoggedSet, Template, MoodId, TrainingSplit } from '../../types';
 
+type WorkoutStep = 'start' | 'body_part' | 'exercise' | 'tpl_exercise' | 'set_logger' | 'rest' | 'summary';
+
 const KG_TO_LBS = 2.20462;
 
 /* ─── Equipment badge ─────────────────────────────────────────────────────── */
@@ -892,6 +894,22 @@ export default function WorkoutScreen({ navigate }: { navigate: (s: ScreenName) 
   const startTime = useRef(Date.now());
   const setsRef = useRef<LoggedSet[]>([]);
   const restDuration = DB.get<number>('restTime', 90);
+
+  // Reset to start screen on mount
+  useEffect(() => {
+    setStep('start');
+    setBodyPart(null);
+    setActiveTpl(null);
+    setExercise(null);
+    setSessionSets([]);
+    setsRef.current = [];
+    setLastSet(null);
+    setRestEndsAt(null);
+    setFromNextEx(false);
+    setShowConfirmEnd(false);
+    startTime.current = Date.now();
+    setSetNumber(1);
+  }, []);
 
   const finish = (sets: LoggedSet[]) => { if (!sets || sets.length === 0) { navigate('home'); return; } saveSession(sets, startTime.current); setStep('summary'); };
   const tryEnd = () => setShowConfirmEnd(true);
