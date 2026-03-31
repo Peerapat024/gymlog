@@ -878,7 +878,6 @@ function SessionSummary({ sessionSets, startTime, onDone }: {
 }
 
 /* ─── WorkoutScreen (controller) ─────────────────────────────────────────── */
-type WorkoutStep = 'start' | 'body_part' | 'exercise' | 'tpl_exercise' | 'set_logger' | 'rest' | 'summary';
 
 export default function WorkoutScreen({ navigate }: { navigate: (s: ScreenName) => void }) {
   const [step, setStep] = useState<WorkoutStep>('start');
