@@ -101,10 +101,10 @@ function InlineAddExerciseForm({ bodyPartId, onAdd, onCancel }: {
 }
 
 /* ─── SplitCard ───────────────────────────────────────────────────────────── */
-function SplitCard({ split, onSelectDay }: { split: TrainingSplit; onSelectDay: (split: TrainingSplit, dayIdx: number) => void }) {
+function SplitCard({ split, onSelectDay, disableInteractions }: { split: TrainingSplit; onSelectDay: (split: TrainingSplit, dayIdx: number) => void; disableInteractions: boolean }) {
   const [open, setOpen] = useState(false);
   return (
-    <div style={{ borderRadius: 14, border: `0.5px solid ${B}`, overflow: 'hidden', background: D }}>
+    <div style={{ borderRadius: 14, border: `0.5px solid ${B}`, overflow: 'hidden', background: D, pointerEvents: disableInteractions ? 'none' : 'auto' }}>
       {/* Header row */}
       <button
         onClick={() => { haptic.light(); setOpen(o => !o); }}
@@ -153,8 +153,15 @@ function WorkoutStartScreen({ sessionSets, onFresh, onTemplate, onFinish }: {
   const defaultIds = new Set(DEFAULT_TEMPLATES.map(t => t.id));
   const userTemplates = getTemplates().filter(t => !defaultIds.has(t.id));
   const inSession = sessionSets.length > 0;
+  const [disableInteractions, setDisableInteractions] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDisableInteractions(false), 150);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleSelectDay = (split: TrainingSplit, dayIdx: number) => {
+    if (disableInteractions) return;
     const day = split.days[dayIdx];
     onTemplate({
       id: `split-${split.id}-${dayIdx}`,
@@ -178,7 +185,7 @@ function WorkoutStartScreen({ sessionSets, onFresh, onTemplate, onFinish }: {
 
       <div style={{ flex: 1, padding: '8px 20px', paddingBottom: 'max(140px,calc(env(safe-area-inset-bottom)+110px))', display: 'flex', flexDirection: 'column', gap: 8 }}>
         {/* Start fresh */}
-        <button onClick={onFresh} style={{ padding: '26px 22px', background: A, border: 'none', borderRadius: 14, color: '#000', cursor: 'pointer', textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <button onClick={() => !disableInteractions && onFresh()} style={{ padding: '26px 22px', background: A, border: 'none', borderRadius: 14, color: '#000', cursor: disableInteractions ? 'default' : 'pointer', textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center', pointerEvents: disableInteractions ? 'none' : 'auto' }}>
           <div>
             <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-0.01em' }}>{inSession ? 'SWITCH MUSCLE GROUP' : 'START FRESH'}</div>
             <div style={{ fontSize: 10, color: 'rgba(0,0,0,0.45)', marginTop: 5, letterSpacing: '0.12em', fontWeight: 700 }}>PICK ANY MUSCLE GROUP</div>
@@ -194,7 +201,7 @@ function WorkoutStartScreen({ sessionSets, onFresh, onTemplate, onFinish }: {
             <div style={{ flex: 1, height: '0.5px', background: B }} />
           </div>
           {userTemplates.map(tpl => (
-            <button key={tpl.id} onClick={() => { haptic.light(); onTemplate(tpl); }} style={{ padding: '18px 22px', background: D, border: `0.5px solid ${B}`, borderRadius: 12, color: '#fff', cursor: 'pointer', textAlign: 'left' }}>
+            <button key={tpl.id} onClick={() => !disableInteractions && (haptic.light(), onTemplate(tpl))} style={{ padding: '18px 22px', background: D, border: `0.5px solid ${B}`, borderRadius: 12, color: '#fff', cursor: disableInteractions ? 'default' : 'pointer', textAlign: 'left', pointerEvents: disableInteractions ? 'none' : 'auto' }}>
               <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: '-0.01em', marginBottom: 8 }}>{tpl.name.toUpperCase()}</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
                 {tpl.exercises.slice(0, 5).map(e => (
@@ -214,7 +221,7 @@ function WorkoutStartScreen({ sessionSets, onFresh, onTemplate, onFinish }: {
         </div>
 
         {splits.map(split => (
-          <SplitCard key={split.id} split={split} onSelectDay={handleSelectDay} />
+          <SplitCard key={split.id} split={split} onSelectDay={handleSelectDay} disableInteractions={disableInteractions} />
         ))}
       </div>
     </div>
