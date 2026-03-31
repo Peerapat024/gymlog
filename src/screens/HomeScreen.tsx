@@ -44,8 +44,8 @@ export default function HomeScreen({ navigate }: { navigate: (s: ScreenName) => 
           <button
             key={item.key}
             onTouchStart={() => haptic.light()}
-            onPointerDown={() => setPressed(item.key)}
-            onPointerUp={() => { setPressed(null); navigate(item.key); }}
+            onPointerDown={(e) => { e.preventDefault(); setPressed(item.key); }}
+            onPointerUp={(e) => { e.preventDefault(); setPressed(null); navigate(item.key); }}
             onPointerLeave={() => setPressed(null)}
             style={{
               flex: 1,
