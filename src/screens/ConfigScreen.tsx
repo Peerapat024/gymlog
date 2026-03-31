@@ -321,15 +321,22 @@ export default function ConfigScreen({ navigate }: { navigate: (s: ScreenName) =
     gemini:    DB.get<string>('aiKey_gemini', ''),
   }));
   const [showKey, setShowKey] = useState(false);
-  const [saved, setSaved] = useState(false);
   const [showLibrary, setShowLibrary] = useState(false);
 
   if (showLibrary) return <LibraryScreen onBack={() => setShowLibrary(false)} />;
 
-  const save = () => {
-    DB.set('restTime', restTime); DB.set('bodyweight', bodyweight); DB.set('weightUnit', weightUnit); DB.set('aiProvider', provider);
-    Object.entries(keys).forEach(([k, v]) => DB.set(`aiKey_${k}`, v.trim()));
-    setSaved(true); setTimeout(() => { setSaved(false); navigate('home'); }, 800);
+  const autoSave = (updates: any = {}) => {
+    const newRestTime = updates.restTime ?? restTime;
+    const newBodyweight = updates.bodyweight ?? bodyweight;
+    const newWeightUnit = updates.weightUnit ?? weightUnit;
+    const newProvider = updates.provider ?? provider;
+    const newKeys = updates.keys ?? keys;
+    
+    DB.set('restTime', newRestTime);
+    DB.set('bodyweight', newBodyweight);
+    DB.set('weightUnit', newWeightUnit);
+    DB.set('aiProvider', newProvider);
+    Object.entries(newKeys).forEach(([k, v]) => DB.set(`aiKey_${k}`, String(v).trim()));
   };
 
   const pInfo = PROVIDERS[provider];
@@ -350,14 +357,14 @@ export default function ConfigScreen({ navigate }: { navigate: (s: ScreenName) =
         <PillSelector
           options={[[60, '60s'], [90, '90s'], [120, '120s'], [180, '180s']] as [number, string][] as any}
           value={restTime as any}
-          onChange={(v: any) => setRestTime(Number(v))}
+          onChange={(v: any) => { const newVal = Number(v); setRestTime(newVal); autoSave({ restTime: newVal }); }}
         />
       </div>
 
       {/* Bodyweight */}
       <div style={{ marginBottom: 28 }}>
         <Lbl style={{ marginBottom: 10 }}>BODYWEIGHT (KG)</Lbl>
-        <input type="number" value={bodyweight} onChange={e => setBodyweight(e.target.value)} placeholder="75"
+        <input type="number" value={bodyweight} onChange={e => { setBodyweight(e.target.value); autoSave({ bodyweight: e.target.value }); }} placeholder="75"
           style={{ background: 'transparent', border: `0.5px solid ${B}`, borderRadius: 10, padding: '14px 16px', color: '#fff', fontSize: 22, fontWeight: 700, width: '100%', outline: 'none' }} />
       </div>
 
@@ -367,7 +374,7 @@ export default function ConfigScreen({ navigate }: { navigate: (s: ScreenName) =
         <PillSelector<WeightUnit>
           options={[['kg', 'KG'], ['lbs', 'LBS'], ['both', 'BOTH']]}
           value={weightUnit}
-          onChange={setWeightUnit}
+          onChange={v => { setWeightUnit(v); autoSave({ weightUnit: v }); }}
         />
         <div style={{ marginTop: 8, fontSize: 10, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.06em', lineHeight: 1.7 }}>
           {weightUnit === 'both' ? 'A KG / LBS toggle appears in the set logger.' : weightUnit === 'lbs' ? 'All weights logged in pounds.' : 'All weights logged in kilograms.'}
@@ -379,7 +386,7 @@ export default function ConfigScreen({ navigate }: { navigate: (s: ScreenName) =
         <Lbl style={{ marginBottom: 10 }}>AI PROVIDER</Lbl>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
           {(Object.entries(PROVIDERS) as [AIProvider, typeof PROVIDERS[AIProvider]][]).map(([id, info]) => (
-            <button key={id} onClick={() => setProvider(id)}
+            <button key={id} onClick={() => { setProvider(id); autoSave({ provider: id }); }}
               style={{ padding: '13px 16px', background: provider === id ? 'rgba(200,255,0,0.07)' : D, border: `0.5px solid ${provider === id ? 'rgba(200,255,0,0.28)' : B}`, borderRadius: 10, color: provider === id ? A : 'rgba(255,255,255,0.45)', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', textAlign: 'left', transition: 'all 0.15s' }}>
               <div>
                 <span style={{ fontSize: 13, fontWeight: 700 }}>{info.label}</span>
@@ -398,7 +405,7 @@ export default function ConfigScreen({ navigate }: { navigate: (s: ScreenName) =
           <input
             type={showKey ? 'text' : 'password'}
             value={currentKey}
-            onChange={e => setKeys({ ...keys, [provider]: e.target.value })}
+            onChange={e => { const newKeys_ = { ...keys, [provider]: e.target.value }; setKeys(newKeys_); autoSave({ keys: newKeys_ }); }}
             placeholder={pInfo.hint}
             style={{ background: 'transparent', border: `0.5px solid ${hasKey ? 'rgba(200,255,0,0.25)' : B}`, borderRadius: 10, padding: '13px 52px 13px 16px', color: '#fff', fontSize: 16, width: '100%', outline: 'none', fontFamily: 'monospace', letterSpacing: '0.04em' }}
           />
@@ -429,9 +436,9 @@ export default function ConfigScreen({ navigate }: { navigate: (s: ScreenName) =
 
       {/* Save */}
       <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end' }}>
-        <button onClick={() => { haptic.medium(); save(); }}
-          style={{ width: '100%', padding: '18px', background: saved ? 'rgba(200,255,0,0.12)' : A, border: saved ? `0.5px solid rgba(200,255,0,0.4)` : 'none', borderRadius: 14, fontSize: 13, fontWeight: 800, letterSpacing: '0.15em', cursor: 'pointer', color: saved ? A : '#000', transition: 'all 0.2s' }}>
-          {saved ? '✓ SAVED' : 'SAVE SETTINGS'}
+        <button onClick={() => { haptic.medium(); navigate('home'); }}
+          style={{ width: '100%', padding: '18px', background: A, border: 'none', borderRadius: 14, fontSize: 13, fontWeight: 800, letterSpacing: '0.15em', cursor: 'pointer', color: '#000', transition: 'all 0.2s' }}>
+          ← BACK
         </button>
       </div>
     </div>
