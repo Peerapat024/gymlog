@@ -151,7 +151,7 @@ function WorkoutStartScreen({ sessionSets, onFresh, onTemplate, onFinish }: {
 }) {
   const splits = getSplits();
   const defaultIds = new Set(DEFAULT_TEMPLATES.map(t => t.id));
-  const userTemplates = getTemplates().filter(t => !defaultIds.has(t.id));
+  const userTemplates = getTemplates().filter(t => !defaultIds.has(t.id) && !t.id.startsWith('split-'));
   const inSession = sessionSets.length > 0;
   const [disableInteractions, setDisableInteractions] = useState(true);
 

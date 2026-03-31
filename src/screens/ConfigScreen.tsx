@@ -262,14 +262,14 @@ function LibraryScreen({ onBack }: { onBack: () => void }) {
             + CREATE NEW TEMPLATE
           </button>
           {/* Custom templates */}
-          {templates.filter(t => !DEFAULT_TEMPLATES.find(dt => dt.id === t.id)).length > 0 && (
+          {templates.filter(t => !DEFAULT_TEMPLATES.find(dt => dt.id === t.id) && !t.id.startsWith('split-')).length > 0 && (
             <>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0 16px' }}>
                 <div style={{ flex: 1, height: '0.5px', background: B }} />
                 <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.2em', fontWeight: 700 }}>YOUR TEMPLATES</span>
                 <div style={{ flex: 1, height: '0.5px', background: B }} />
               </div>
-              {templates.filter(t => !DEFAULT_TEMPLATES.find(dt => dt.id === t.id)).map(tpl => (
+              {templates.filter(t => !DEFAULT_TEMPLATES.find(dt => dt.id === t.id) && !t.id.startsWith('split-')).map(tpl => (
                 <div key={tpl.id} style={{ background: D, border: `0.5px solid ${B}`, borderRadius: 12, marginBottom: 8, overflow: 'hidden' }}>
                   <div style={{ padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
@@ -293,10 +293,10 @@ function LibraryScreen({ onBack }: { onBack: () => void }) {
               ))}
             </>
           )}
-          {/* Default templates */}
-          {DEFAULT_TEMPLATES.length > 0 && (
+          {/* Default templates - Simple + Splits */}
+          {(DEFAULT_TEMPLATES.length > 0 || templates.filter(t => t.id.startsWith('split-')).length > 0) && (
             <>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0 16px', marginTop: templates.filter(t => !DEFAULT_TEMPLATES.find(dt => dt.id === t.id)).length > 0 ? '12px' : '0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0 16px', marginTop: templates.filter(t => !DEFAULT_TEMPLATES.find(dt => dt.id === t.id) && !t.id.startsWith('split-')).length > 0 ? '12px' : '0' }}>
                 <div style={{ flex: 1, height: '0.5px', background: B }} />
                 <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.2em', fontWeight: 700 }}>DEFAULT TEMPLATES</span>
                 <div style={{ flex: 1, height: '0.5px', background: B }} />
@@ -322,6 +322,36 @@ function LibraryScreen({ onBack }: { onBack: () => void }) {
                   </div>
                 </div>
               ))}
+              {templates.filter(t => t.id.startsWith('split-')).length > 0 && (
+                <>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '16px 0 8px' }}>
+                    <div style={{ flex: 1, height: '0.5px', background: B }} />
+                    <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.2em', fontWeight: 700 }}>SPLIT TEMPLATES</span>
+                    <div style={{ flex: 1, height: '0.5px', background: B }} />
+                  </div>
+                  {templates.filter(t => t.id.startsWith('split-')).map(tpl => (
+                    <div key={tpl.id} style={{ background: D, border: `0.5px solid ${B}`, borderRadius: 12, marginBottom: 8, overflow: 'hidden', opacity: 0.7 }}>
+                      <div style={{ padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                          <div style={{ fontSize: 15, fontWeight: 800, color: '#fff' }}>{tpl.name}</div>
+                          <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.28)', marginTop: 3, letterSpacing: '0.08em' }}>{tpl.exercises.length} EXERCISES</div>
+                        </div>
+                        <div style={{ display: 'flex', gap: 10 }}>
+                          <button onClick={() => { setEditingTpl({ ...tpl, exercises: [...tpl.exercises] }); setTplName(tpl.name); setTplNameError(''); }}
+                            style={{ background: 'none', border: `0.5px solid ${B}`, borderRadius: 6, padding: '5px 10px', color: M, cursor: 'pointer', fontSize: 10, fontWeight: 700 }}>EDIT</button>
+                          <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.2)', fontWeight: 700, letterSpacing: '0.05em' }}>BUILT-IN</span>
+                        </div>
+                      </div>
+                      <div style={{ padding: '0 16px 12px', display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                        {tpl.exercises.slice(0, 6).map(e => (
+                          <span key={e.name} style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', background: '#0F0F0F', padding: '3px 8px', borderRadius: 5 }}>{e.name}</span>
+                        ))}
+                        {tpl.exercises.length > 6 && <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)' }}>+{tpl.exercises.length - 6} more</span>}
+                      </div>
+                    </div>
+                  ))}
+                </>
+              )}
             </>
           )}
         </div>

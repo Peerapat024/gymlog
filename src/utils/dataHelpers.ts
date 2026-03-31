@@ -53,9 +53,25 @@ export function getPR(name: string): number {
 export function getTemplates(): Template[] {
   const stored = DB.get<Template[] | null>('templates', null);
   const custom = stored || [];
-  // Return default templates + custom templates (defaults always come first)
+  
+  // Generate default templates from both simple templates and all split days
+  const defaultTemplates: Template[] = [...DEFAULT_TEMPLATES];
+  
+  // Add all split day templates as defaults
+  for (const split of DEFAULT_SPLITS) {
+    for (let i = 0; i < split.days.length; i++) {
+      const day = split.days[i];
+      defaultTemplates.push({
+        id: `split-${split.id}-${i}`,
+        name: `${split.name} · ${day.name}`,
+        exercises: day.exercises,
+      });
+    }
+  }
+  
+  // Return default templates + custom templates (defaults first)
   const customNonDefaults = custom.filter(t => !DEFAULT_TEMPLATES.find(d => d.id === t.id));
-  return [...DEFAULT_TEMPLATES, ...customNonDefaults];
+  return [...defaultTemplates, ...customNonDefaults];
 }
 
 export function getSplits(): TrainingSplit[] {
