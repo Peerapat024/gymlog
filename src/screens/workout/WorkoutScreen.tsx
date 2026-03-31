@@ -4,6 +4,7 @@ import { DB } from '../../utils/db';
 import { haptic } from '../../utils/haptics';
 import { getExercises, getExerciseInfo, getCustomExercises, saveCustomExercises, getHistory, getPR, getTemplates, getSplits, saveSession } from '../../utils/dataHelpers';
 import { DEFAULT_TEMPLATES } from '../../constants/exercises';
+import { getVolumeComparison } from '../../constants/volumeComparisons';
 import type { EquipmentType } from '../../types';
 import { Back, Lbl, BigTitle } from '../../components/shared';
 import RepWheel from '../../components/ui/RepWheel';
@@ -871,6 +872,17 @@ function SessionSummary({ sessionSets, startTime, onDone }: {
             </div>
           ))}
         </div>
+
+        {(() => {
+          const comparison = getVolumeComparison(totalVol);
+          return comparison ? (
+            <div style={{ background: 'rgba(200,255,0,0.08)', border: '0.5px solid rgba(200,255,0,0.22)', borderRadius: 12, padding: '16px', marginBottom: 20, textAlign: 'center' }}>
+              <div style={{ fontSize: 12, color: 'rgba(200,255,0,0.5)', letterSpacing: '0.1em', fontWeight: 700, marginBottom: 8 }}>EQUIVALENT TO</div>
+              <div style={{ fontSize: 22, fontWeight: 900, color: A, marginBottom: 6 }}>{comparison.object.name}</div>
+              <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', fontStyle: 'italic', lineHeight: 1.5 }}>"{comparison.phrase}"</div>
+            </div>
+          ) : null;
+        })()}
 
         <textarea value={note} onChange={e => setNote(e.target.value)} placeholder="Any notes for next time..." rows={2}
           style={{ width: '100%', marginTop: 8, background: 'transparent', border: 'none', borderTop: `0.5px solid ${B}`, padding: '14px 0 0', color: 'rgba(255,255,255,0.3)', fontSize: 14, outline: 'none', resize: 'none', fontFamily: 'inherit', lineHeight: 1.6 }} />
