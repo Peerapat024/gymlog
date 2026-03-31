@@ -879,7 +879,7 @@ function SessionSummary({ sessionSets, startTime, onDone }: {
             <div style={{ background: 'rgba(200,255,0,0.08)', border: '0.5px solid rgba(200,255,0,0.22)', borderRadius: 12, padding: '16px', marginBottom: 20, textAlign: 'center' }}>
               <div style={{ fontSize: 12, color: 'rgba(200,255,0,0.5)', letterSpacing: '0.1em', fontWeight: 700, marginBottom: 8 }}>EQUIVALENT TO</div>
               <div style={{ fontSize: 22, fontWeight: 900, color: A, marginBottom: 6 }}>{comparison.object.name}</div>
-              <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', fontStyle: 'italic', lineHeight: 1.5 }}>"{comparison.phrase}"</div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: 'rgba(255,255,255,0.7)', fontStyle: 'italic', lineHeight: 1.5 }}>"{comparison.phrase}"</div>
             </div>
           ) : null;
         })()}
