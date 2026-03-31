@@ -55,7 +55,7 @@ export default function DataScreen({ navigate }: { navigate: (s: ScreenName) => 
       {/* Header */}
       <div style={{ padding: '52px 28px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
         <Back onBack={() => navigate('home')} />
-        <button onClick={() => exportCSV(sessions)} style={{ background: 'none', border: `0.5px solid ${B}`, borderRadius: 7, padding: '6px 12px', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', fontSize: 10, letterSpacing: '0.12em', fontWeight: 700 }}>
+        <button onClick={() => exportCSV(sessions)} style={{ background: 'none', border: `0.5px solid ${B}`, borderRadius: 7, padding: '7px 14px', color: 'rgba(255,255,255,0.65)', cursor: 'pointer', fontSize: 12, letterSpacing: '0.08em', fontWeight: 700 }}>
           EXPORT CSV
         </button>
       </div>
@@ -89,8 +89,8 @@ export default function DataScreen({ navigate }: { navigate: (s: ScreenName) => 
         {tab === 'overview' && (sessions.length === 0
           ? (
             <div style={{ textAlign: 'center', padding: '60px 0' }}>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.15em' }}>NO SESSIONS YET</div>
-              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.12)', marginTop: 8, letterSpacing: '0.1em' }}>GO LIFT SOMETHING</div>
+              <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.1em', fontWeight: 600 }}>NO SESSIONS YET</div>
+              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)', marginTop: 10, letterSpacing: '0.06em' }}>GO LIFT SOMETHING</div>
             </div>
           ) : (
             <>
@@ -102,11 +102,11 @@ export default function DataScreen({ navigate }: { navigate: (s: ScreenName) => 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
                 {Object.entries(mCount).sort((a, b) => b[1] - a[1]).map(([part, cnt]) => (
                   <div key={part} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.1em', fontWeight: 700, width: 80, flexShrink: 0 }}>{part.toUpperCase()}</span>
-                    <div style={{ flex: 1, height: 5, background: '#0D0D0D', borderRadius: 3, overflow: 'hidden' }}>
-                      <div style={{ width: `${(cnt / mMax) * 100}%`, height: '100%', background: A, borderRadius: 3, opacity: 0.75 }} />
+                    <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', letterSpacing: '0.08em', fontWeight: 700, width: 85, flexShrink: 0 }}>{part.toUpperCase()}</span>
+                    <div style={{ flex: 1, height: 6, background: '#0D0D0D', borderRadius: 3, overflow: 'hidden' }}>
+                      <div style={{ width: `${(cnt / mMax) * 100}%`, height: '100%', background: A, borderRadius: 3, opacity: 0.85 }} />
                     </div>
-                    <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.28)', width: 28, textAlign: 'right', fontWeight: 700 }}>{cnt}×</span>
+                    <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', width: 32, textAlign: 'right', fontWeight: 700 }}>{cnt}×</span>
                   </div>
                 ))}
               </div>
@@ -132,16 +132,16 @@ export default function DataScreen({ navigate }: { navigate: (s: ScreenName) => 
                 <div style={{ textAlign: 'left' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{ex.name}</span>
-                    <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.1em', fontWeight: 700 }}>{ex.bodyPart?.toUpperCase()}</span>
+                    <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.06em', fontWeight: 700 }}>{ex.bodyPart?.toUpperCase()}</span>
                   </div>
                   <div style={{ display: 'flex', gap: 14, marginTop: 5 }}>
-                    <span style={{ fontSize: 10, color: A, fontWeight: 700 }}>PR {ex.pr}KG</span>
-                    <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.28)' }}>{ex.sessions} SESSION{ex.sessions !== 1 ? 'S' : ''}</span>
+                    <span style={{ fontSize: 12, color: A, fontWeight: 700 }}>PR {ex.pr}KG</span>
+                    <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)' }}>{ex.sessions} SESSION{ex.sessions !== 1 ? 'S' : ''}</span>
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <Sparkline data={ex.sparkData} />
-                  <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.2)' }}>›</span>
+                  <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>›</span>
                 </div>
               </button>
             ))}
@@ -164,7 +164,7 @@ export default function DataScreen({ navigate }: { navigate: (s: ScreenName) => 
         {tab === 'coach' && (
           <div>
             <div style={{ fontSize: 'clamp(26px,6vw,38px)', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.1, marginBottom: 8 }}>AI COACH</div>
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.06em', lineHeight: 1.75, marginBottom: 20 }}>
+            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', letterSpacing: '0.02em', lineHeight: 1.6, marginBottom: 20 }}>
               Analyses your full training history — plateaus, imbalances, volume trends, what to focus on next.
             </div>
             <AiCoach sessions={sessions} />

@@ -20,7 +20,7 @@ const EQUIP_CONFIG: Record<EquipmentType, { label: string; text: string }> = {
 };
 function LibEquipBadge({ type }: { type: EquipmentType }) {
   const e = EQUIP_CONFIG[type];
-  return <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.06em', color: e.text, flexShrink: 0 }}>{e.label}</span>;
+  return <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.04em', color: e.text, flexShrink: 0 }}>{e.label}</span>;
 }
 
 const EQUIPMENT_OPTIONS: EquipmentType[] = ['Barbell', 'Dumbbell', 'Cable', 'Machine', 'Bodyweight'];
@@ -56,7 +56,7 @@ function AddExerciseForm({ onAdd, onCancel, autoFocus = true }: {
       />
       {/* Optional details toggle */}
       {!showDetails ? (
-        <button onClick={() => setShowDetails(true)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.28)', cursor: 'pointer', fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', padding: 0, marginBottom: 12 }}>
+        <button onClick={() => setShowDetails(true)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', padding: 0, marginBottom: 12 }}>
           + ADD DETAILS (OPTIONAL)
         </button>
       ) : (
@@ -77,7 +77,7 @@ function AddExerciseForm({ onAdd, onCancel, autoFocus = true }: {
               const active = equipment === eq;
               return (
                 <button key={eq} onClick={() => setEquipment(active ? null : eq)}
-                  style={{ padding: '6px 12px', background: active ? 'rgba(255,255,255,0.06)' : 'transparent', border: `0.5px solid ${active ? 'rgba(255,255,255,0.18)' : B}`, borderRadius: 7, color: active ? e.text : 'rgba(255,255,255,0.28)', fontSize: 10, fontWeight: 800, cursor: 'pointer', letterSpacing: '0.06em', transition: 'all 0.12s' }}>
+                  style={{ padding: '6px 12px', background: active ? 'rgba(255,255,255,0.06)' : 'transparent', border: `0.5px solid ${active ? 'rgba(255,255,255,0.18)' : B}`, borderRadius: 7, color: active ? e.text : 'rgba(255,255,255,0.45)', fontSize: 11, fontWeight: 800, cursor: 'pointer', letterSpacing: '0.04em', transition: 'all 0.12s' }}>
                   {e.label}
                 </button>
               );
@@ -87,9 +87,9 @@ function AddExerciseForm({ onAdd, onCancel, autoFocus = true }: {
       )}
       {/* Actions */}
       <div style={{ display: 'flex', gap: 8 }}>
-        <button onClick={onCancel} style={{ padding: '11px 16px', background: 'transparent', border: `0.5px solid ${B}`, borderRadius: 9, fontSize: 11, fontWeight: 700, cursor: 'pointer', color: 'rgba(255,255,255,0.3)', letterSpacing: '0.08em' }}>CANCEL</button>
+        <button onClick={onCancel} style={{ padding: '11px 16px', background: 'transparent', border: `0.5px solid ${B}`, borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: 'pointer', color: 'rgba(255,255,255,0.55)', letterSpacing: '0.06em' }}>CANCEL</button>
         <button onClick={handleAdd} disabled={!canAdd}
-          style={{ flex: 1, padding: '11px 0', background: canAdd ? A : '#111', border: 'none', borderRadius: 9, fontSize: 13, fontWeight: 800, cursor: canAdd ? 'pointer' : 'default', color: canAdd ? '#000' : 'rgba(255,255,255,0.15)', letterSpacing: '0.06em' }}>
+          style={{ flex: 1, padding: '11px 0', background: canAdd ? A : '#111', border: 'none', borderRadius: 9, fontSize: 14, fontWeight: 800, cursor: canAdd ? 'pointer' : 'default', color: canAdd ? '#000' : 'rgba(255,255,255,0.15)', letterSpacing: '0.04em' }}>
           ADD EXERCISE
         </button>
       </div>
@@ -145,7 +145,7 @@ function LibraryScreen({ onBack }: { onBack: () => void }) {
           <Lbl style={{ marginBottom: 8 }}>TEMPLATE NAME</Lbl>
           <input value={tplName} onChange={e => { setTplName(e.target.value); setTplNameError(''); }} placeholder="e.g. Push Day"
             style={{ width: '100%', background: D, border: `0.5px solid ${tplNameError ? '#FF453A' : B}`, borderRadius: 10, padding: '13px 14px', color: '#fff', fontSize: 16, fontWeight: 700, outline: 'none' }} />
-          {tplNameError && <div style={{ marginTop: 6, fontSize: 11, color: '#FF453A', fontWeight: 600 }}>{tplNameError}</div>}
+          {tplNameError && <div style={{ marginTop: 6, fontSize: 12, color: '#FF453A', fontWeight: 600 }}>{tplNameError}</div>}
         </div>
         {editingTpl.exercises.length > 0 && (
           <div style={{ marginBottom: 20 }}>
@@ -153,7 +153,7 @@ function LibraryScreen({ onBack }: { onBack: () => void }) {
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
               {editingTpl.exercises.map(e => (
                 <button key={e.name} onClick={() => toggleEx(e.name, e.bodyPart)}
-                  style={{ padding: '6px 12px', background: 'rgba(200,255,0,0.08)', border: `0.5px solid rgba(200,255,0,0.3)`, borderRadius: 7, color: A, fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
+                  style={{ padding: '6px 12px', background: 'rgba(200,255,0,0.08)', border: `0.5px solid rgba(200,255,0,0.3)`, borderRadius: 7, color: A, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
                   {e.name} ×
                 </button>
               ))}
@@ -164,7 +164,7 @@ function LibraryScreen({ onBack }: { onBack: () => void }) {
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
           {ALL_PARTS.map(p => (
             <button key={p.id} onClick={() => setTplPart(p.id)}
-              style={{ padding: '6px 12px', background: tplPart === p.id ? D : 'transparent', border: `0.5px solid ${tplPart === p.id ? 'rgba(255,255,255,0.2)' : B}`, borderRadius: 7, color: tplPart === p.id ? '#fff' : 'rgba(255,255,255,0.2)', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
+              style={{ padding: '7px 14px', background: tplPart === p.id ? D : 'transparent', border: `0.5px solid ${tplPart === p.id ? 'rgba(255,255,255,0.2)' : B}`, borderRadius: 7, color: tplPart === p.id ? '#fff' : 'rgba(255,255,255,0.4)', fontSize: 12, fontWeight: 700, cursor: 'pointer', letterSpacing: '0.02em' }}>
               {p.label.toUpperCase()}
             </button>
           ))}
@@ -174,7 +174,7 @@ function LibraryScreen({ onBack }: { onBack: () => void }) {
             const sel = !!editingTpl.exercises.find(e => e.name === ex);
             return (
               <button key={ex} onClick={() => toggleEx(ex, tplPart)}
-                style={{ padding: '13px 16px', background: sel ? 'rgba(200,255,0,0.07)' : D, border: `0.5px solid ${sel ? 'rgba(200,255,0,0.25)' : B}`, borderRadius: 10, color: sel ? A : 'rgba(255,255,255,0.5)', fontSize: 13, fontWeight: 700, cursor: 'pointer', textAlign: 'left', display: 'flex', justifyContent: 'space-between' }}>
+                style={{ padding: '13px 16px', background: sel ? 'rgba(200,255,0,0.07)' : D, border: `0.5px solid ${sel ? 'rgba(200,255,0,0.25)' : B}`, borderRadius: 10, color: sel ? A : 'rgba(255,255,255,0.7)', fontSize: 14, fontWeight: 700, cursor: 'pointer', textAlign: 'left', display: 'flex', justifyContent: 'space-between' }}>
                 {ex}{sel && <span style={{ color: A }}>✓</span>}
               </button>
             );
@@ -206,7 +206,7 @@ function LibraryScreen({ onBack }: { onBack: () => void }) {
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 16 }}>
             {ALL_PARTS.map(p => (
               <button key={p.id} onClick={() => { setSelPart(p.id); setAdding(false); }}
-                style={{ padding: '6px 12px', background: selPart === p.id ? A : 'transparent', border: `0.5px solid ${selPart === p.id ? A : B}`, borderRadius: 7, color: selPart === p.id ? '#000' : 'rgba(255,255,255,0.28)', fontSize: 11, fontWeight: 800, cursor: 'pointer' }}>
+                style={{ padding: '7px 14px', background: selPart === p.id ? A : 'transparent', border: `0.5px solid ${selPart === p.id ? A : B}`, borderRadius: 7, color: selPart === p.id ? '#000' : 'rgba(255,255,255,0.5)', fontSize: 12, fontWeight: 800, cursor: 'pointer', letterSpacing: '0.02em' }}>
                 {p.label.toUpperCase()}
               </button>
             ))}
@@ -217,7 +217,7 @@ function LibraryScreen({ onBack }: { onBack: () => void }) {
               <AddExerciseForm onAdd={addEx} onCancel={() => setAdding(false)} />
             </div>
           ) : (
-            <button onClick={() => setAdding(true)} style={{ width: '100%', padding: '13px', background: 'transparent', border: `0.5px solid ${B}`, borderRadius: 10, color: 'rgba(255,255,255,0.35)', cursor: 'pointer', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', marginBottom: 20 }}>
+            <button onClick={() => setAdding(true)} style={{ width: '100%', padding: '14px', background: 'transparent', border: `0.5px solid ${B}`, borderRadius: 10, color: 'rgba(255,255,255,0.55)', cursor: 'pointer', fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 20 }}>
               + ADD TO {selPart.toUpperCase()}
             </button>
           )}
@@ -225,11 +225,11 @@ function LibraryScreen({ onBack }: { onBack: () => void }) {
           <Lbl style={{ marginBottom: 10 }}>DEFAULT</Lbl>
           {(LIBRARY[selPart] || []).map(ex => (
             <div key={ex.name} style={{ padding: '11px 0', borderBottom: `0.5px solid ${B}` }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 3 }}>
-                <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', fontWeight: 600 }}>{ex.name}</span>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 4 }}>
+                <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.65)', fontWeight: 600 }}>{ex.name}</span>
                 <LibEquipBadge type={ex.equipment} />
               </div>
-              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.22)', lineHeight: 1.4 }}>{ex.focus}</div>
+              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', lineHeight: 1.5 }}>{ex.focus}</div>
             </div>
           ))}
           {/* Custom exercises */}
@@ -240,13 +240,13 @@ function LibraryScreen({ onBack }: { onBack: () => void }) {
                 <div key={ex.name} style={{ padding: '12px 0', borderBottom: `0.5px solid ${B}` }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
                     <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: ex.focus ? 4 : 0 }}>
-                        <span style={{ fontSize: 13, color: A, fontWeight: 700 }}>{ex.name}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: ex.focus ? 6 : 0 }}>
+                        <span style={{ fontSize: 14, color: A, fontWeight: 700 }}>{ex.name}</span>
                         {ex.equipment && <LibEquipBadge type={ex.equipment} />}
                       </div>
-                      {ex.focus && <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', lineHeight: 1.4 }}>{ex.focus}</div>}
+                      {ex.focus && <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>{ex.focus}</div>}
                     </div>
-                    <button onClick={() => delEx(selPart, ex.name)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.25)', cursor: 'pointer', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', flexShrink: 0, paddingTop: 1 }}>DELETE</button>
+                    <button onClick={() => delEx(selPart, ex.name)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', fontSize: 12, fontWeight: 700, letterSpacing: '0.04em', flexShrink: 0, paddingTop: 1 }}>DELETE</button>
                   </div>
                 </div>
               ))}
@@ -266,7 +266,7 @@ function LibraryScreen({ onBack }: { onBack: () => void }) {
             <>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0 16px' }}>
                 <div style={{ flex: 1, height: '0.5px', background: B }} />
-                <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.2em', fontWeight: 700 }}>YOUR TEMPLATES</span>
+                <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.15em', fontWeight: 700 }}>YOUR TEMPLATES</span>
                 <div style={{ flex: 1, height: '0.5px', background: B }} />
               </div>
               {templates.filter(t => !DEFAULT_TEMPLATES.find(dt => dt.id === t.id) && !t.id.startsWith('split-')).map(tpl => (
@@ -274,20 +274,20 @@ function LibraryScreen({ onBack }: { onBack: () => void }) {
                   <div style={{ padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
                       <div style={{ fontSize: 15, fontWeight: 800, color: '#fff' }}>{tpl.name}</div>
-                      <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.28)', marginTop: 3, letterSpacing: '0.08em' }}>{tpl.exercises.length} EXERCISES</div>
+                      <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', marginTop: 4, letterSpacing: '0.04em', fontWeight: 600 }}>{tpl.exercises.length} EXERCISES</div>
                     </div>
                     <div style={{ display: 'flex', gap: 10 }}>
                       <button onClick={() => { setEditingTpl({ ...tpl, exercises: [...tpl.exercises] }); setTplName(tpl.name); setTplNameError(''); }}
-                        style={{ background: 'none', border: `0.5px solid ${B}`, borderRadius: 6, padding: '5px 10px', color: M, cursor: 'pointer', fontSize: 10, fontWeight: 700 }}>EDIT</button>
+                        style={{ background: 'none', border: `0.5px solid ${B}`, borderRadius: 6, padding: '6px 12px', color: M, cursor: 'pointer', fontSize: 11, fontWeight: 700 }}>EDIT</button>
                       <button onClick={() => saveTpls(templates.filter(t => t.id !== tpl.id))}
-                        style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', cursor: 'pointer', fontSize: 10, fontWeight: 700 }}>DELETE</button>
+                        style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', fontSize: 11, fontWeight: 700 }}>DELETE</button>
                     </div>
                   </div>
                   <div style={{ padding: '0 16px 12px', display: 'flex', flexWrap: 'wrap', gap: 5 }}>
                     {tpl.exercises.slice(0, 6).map(e => (
-                      <span key={e.name} style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', background: '#0F0F0F', padding: '3px 8px', borderRadius: 5 }}>{e.name}</span>
+                      <span key={e.name} style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', background: '#0F0F0F', padding: '4px 9px', borderRadius: 5 }}>{e.name}</span>
                     ))}
-                    {tpl.exercises.length > 6 && <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)' }}>+{tpl.exercises.length - 6} more</span>}
+                    {tpl.exercises.length > 6 && <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', padding: '4px 0' }}>+{tpl.exercises.length - 6} more</span>}
                   </div>
                 </div>
               ))}
@@ -298,7 +298,7 @@ function LibraryScreen({ onBack }: { onBack: () => void }) {
             <>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0 16px', marginTop: templates.filter(t => !DEFAULT_TEMPLATES.find(dt => dt.id === t.id) && !t.id.startsWith('split-')).length > 0 ? '12px' : '0' }}>
                 <div style={{ flex: 1, height: '0.5px', background: B }} />
-                <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.2em', fontWeight: 700 }}>DEFAULT TEMPLATES</span>
+                <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.15em', fontWeight: 700 }}>DEFAULT TEMPLATES</span>
                 <div style={{ flex: 1, height: '0.5px', background: B }} />
               </div>
               {DEFAULT_TEMPLATES.map(tpl => (
@@ -306,19 +306,19 @@ function LibraryScreen({ onBack }: { onBack: () => void }) {
                   <div style={{ padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
                       <div style={{ fontSize: 15, fontWeight: 800, color: '#fff' }}>{tpl.name}</div>
-                      <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.28)', marginTop: 3, letterSpacing: '0.08em' }}>{tpl.exercises.length} EXERCISES</div>
+                      <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', marginTop: 4, letterSpacing: '0.04em', fontWeight: 600 }}>{tpl.exercises.length} EXERCISES</div>
                     </div>
-                    <div style={{ display: 'flex', gap: 10 }}>
+                    <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
                       <button onClick={() => { setEditingTpl({ ...tpl, exercises: [...tpl.exercises] }); setTplName(tpl.name); setTplNameError(''); }}
-                        style={{ background: 'none', border: `0.5px solid ${B}`, borderRadius: 6, padding: '5px 10px', color: M, cursor: 'pointer', fontSize: 10, fontWeight: 700 }}>EDIT</button>
-                      <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.2)', fontWeight: 700, letterSpacing: '0.05em' }}>BUILT-IN</span>
+                        style={{ background: 'none', border: `0.5px solid ${B}`, borderRadius: 6, padding: '6px 12px', color: M, cursor: 'pointer', fontSize: 11, fontWeight: 700 }}>EDIT</button>
+                      <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', fontWeight: 700, letterSpacing: '0.02em' }}>BUILT-IN</span>
                     </div>
                   </div>
                   <div style={{ padding: '0 16px 12px', display: 'flex', flexWrap: 'wrap', gap: 5 }}>
                     {tpl.exercises.slice(0, 6).map(e => (
-                      <span key={e.name} style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', background: '#0F0F0F', padding: '3px 8px', borderRadius: 5 }}>{e.name}</span>
+                      <span key={e.name} style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', background: '#0F0F0F', padding: '4px 9px', borderRadius: 5 }}>{e.name}</span>
                     ))}
-                    {tpl.exercises.length > 6 && <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)' }}>+{tpl.exercises.length - 6} more</span>}
+                    {tpl.exercises.length > 6 && <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', padding: '4px 0' }}>+{tpl.exercises.length - 6} more</span>}
                   </div>
                 </div>
               ))}
@@ -326,7 +326,7 @@ function LibraryScreen({ onBack }: { onBack: () => void }) {
                 <>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '16px 0 8px' }}>
                     <div style={{ flex: 1, height: '0.5px', background: B }} />
-                    <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.2em', fontWeight: 700 }}>SPLIT TEMPLATES</span>
+                    <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.15em', fontWeight: 700 }}>SPLIT TEMPLATES</span>
                     <div style={{ flex: 1, height: '0.5px', background: B }} />
                   </div>
                   {templates.filter(t => t.id.startsWith('split-')).map(tpl => (
@@ -334,19 +334,19 @@ function LibraryScreen({ onBack }: { onBack: () => void }) {
                       <div style={{ padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div>
                           <div style={{ fontSize: 15, fontWeight: 800, color: '#fff' }}>{tpl.name}</div>
-                          <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.28)', marginTop: 3, letterSpacing: '0.08em' }}>{tpl.exercises.length} EXERCISES</div>
+                          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', marginTop: 4, letterSpacing: '0.04em', fontWeight: 600 }}>{tpl.exercises.length} EXERCISES</div>
                         </div>
-                        <div style={{ display: 'flex', gap: 10 }}>
+                        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
                           <button onClick={() => { setEditingTpl({ ...tpl, exercises: [...tpl.exercises] }); setTplName(tpl.name); setTplNameError(''); }}
-                            style={{ background: 'none', border: `0.5px solid ${B}`, borderRadius: 6, padding: '5px 10px', color: M, cursor: 'pointer', fontSize: 10, fontWeight: 700 }}>EDIT</button>
-                          <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.2)', fontWeight: 700, letterSpacing: '0.05em' }}>BUILT-IN</span>
+                            style={{ background: 'none', border: `0.5px solid ${B}`, borderRadius: 6, padding: '6px 12px', color: M, cursor: 'pointer', fontSize: 11, fontWeight: 700 }}>EDIT</button>
+                          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', fontWeight: 700, letterSpacing: '0.02em' }}>BUILT-IN</span>
                         </div>
                       </div>
                       <div style={{ padding: '0 16px 12px', display: 'flex', flexWrap: 'wrap', gap: 5 }}>
                         {tpl.exercises.slice(0, 6).map(e => (
-                          <span key={e.name} style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', background: '#0F0F0F', padding: '3px 8px', borderRadius: 5 }}>{e.name}</span>
+                          <span key={e.name} style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', background: '#0F0F0F', padding: '4px 9px', borderRadius: 5 }}>{e.name}</span>
                         ))}
-                        {tpl.exercises.length > 6 && <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)' }}>+{tpl.exercises.length - 6} more</span>}
+                        {tpl.exercises.length > 6 && <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', padding: '4px 0' }}>+{tpl.exercises.length - 6} more</span>}
                       </div>
                     </div>
                   ))}
@@ -446,7 +446,7 @@ export default function ConfigScreen({ navigate }: { navigate: (s: ScreenName) =
           value={weightUnit}
           onChange={v => { setWeightUnit(v); autoSave({ weightUnit: v }); }}
         />
-        <div style={{ marginTop: 8, fontSize: 10, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.06em', lineHeight: 1.7 }}>
+        <div style={{ marginTop: 8, fontSize: 12, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.04em', lineHeight: 1.6 }}>
           {weightUnit === 'both' ? 'A KG / LBS toggle appears in the set logger.' : weightUnit === 'lbs' ? 'All weights logged in pounds.' : 'All weights logged in kilograms.'}
         </div>
       </div>
@@ -460,9 +460,9 @@ export default function ConfigScreen({ navigate }: { navigate: (s: ScreenName) =
               style={{ padding: '13px 16px', background: provider === id ? 'rgba(200,255,0,0.07)' : D, border: `0.5px solid ${provider === id ? 'rgba(200,255,0,0.28)' : B}`, borderRadius: 10, color: provider === id ? A : 'rgba(255,255,255,0.45)', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', textAlign: 'left', transition: 'all 0.15s' }}>
               <div>
                 <span style={{ fontSize: 13, fontWeight: 700 }}>{info.label}</span>
-                {info.free && <span style={{ fontSize: 9, color: 'rgba(200,255,0,0.5)', marginLeft: 8, letterSpacing: '0.08em', fontWeight: 700 }}>FREE TIER</span>}
+                {info.free && <span style={{ fontSize: 11, color: 'rgba(200,255,0,0.6)', marginLeft: 8, letterSpacing: '0.06em', fontWeight: 700 }}>FREE TIER</span>}
               </div>
-              {keys[id]?.length > 8 && <span style={{ fontSize: 9, color: A, letterSpacing: '0.1em', fontWeight: 700 }}>✓ KEY SET</span>}
+              {keys[id]?.length > 8 && <span style={{ fontSize: 11, color: A, letterSpacing: '0.08em', fontWeight: 700 }}>✓ KEY SET</span>}
             </button>
           ))}
         </div>
@@ -483,7 +483,7 @@ export default function ConfigScreen({ navigate }: { navigate: (s: ScreenName) =
             {showKey ? 'HIDE' : 'SHOW'}
           </button>
         </div>
-        <div style={{ marginTop: 8, fontSize: 10, color: 'rgba(255,255,255,0.22)', letterSpacing: '0.06em', lineHeight: 1.7 }}>
+        <div style={{ marginTop: 8, fontSize: 12, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.04em', lineHeight: 1.6 }}>
           {provider === 'anthropic' && 'console.anthropic.com → API Keys'}
           {provider === 'openai'    && 'platform.openai.com → API Keys'}
           {provider === 'groq'      && 'console.groq.com → API Keys (free tier available)'}
@@ -497,7 +497,7 @@ export default function ConfigScreen({ navigate }: { navigate: (s: ScreenName) =
         <button onClick={() => setShowLibrary(true)} style={{ width: '100%', background: D, border: `0.5px solid ${B}`, borderRadius: 12, padding: '16px 18px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ textAlign: 'left' }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>Manage Library →</div>
-            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.28)', marginTop: 3, letterSpacing: '0.08em' }}>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', marginTop: 4, letterSpacing: '0.04em', fontWeight: 600 }}>
               {tplCount} TEMPLATE{tplCount !== 1 ? 'S' : ''} · {cxCount} CUSTOM EXERCISE{cxCount !== 1 ? 'S' : ''}
             </div>
           </div>

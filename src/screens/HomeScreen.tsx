@@ -23,7 +23,7 @@ export default function HomeScreen({ navigate }: { navigate: (s: ScreenName) => 
       {/* Header */}
       <div style={{ padding: 'max(48px,env(safe-area-inset-top)) 28px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <span style={{ letterSpacing: '0.3em', fontSize: 10, color: 'rgba(255,255,255,0.28)', fontWeight: 700 }}>GYMLOG</span>
+          <span style={{ letterSpacing: '0.25em', fontSize: 12, color: 'rgba(255,255,255,0.6)', fontWeight: 700 }}>GYMLOG</span>
           {DB.get('userName', '') && (
             <div style={{ fontSize: 15, color: '#fff', fontWeight: 700, marginTop: 4, letterSpacing: '-0.01em' }}>
               Hey, {DB.get<string>('userName', '')}.
@@ -32,8 +32,8 @@ export default function HomeScreen({ navigate }: { navigate: (s: ScreenName) => 
         </div>
         {lastLabel && (
           <div style={{ textAlign: 'right', paddingTop: 2 }}>
-            <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.18em', fontWeight: 700 }}>LAST SESSION</div>
-            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.06em', fontWeight: 700, marginTop: 2 }}>{lastLabel}</div>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', letterSpacing: '0.14em', fontWeight: 700 }}>LAST SESSION</div>
+            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', letterSpacing: '0.04em', fontWeight: 700, marginTop: 2 }}>{lastLabel}</div>
           </div>
         )}
       </div>
@@ -65,11 +65,11 @@ export default function HomeScreen({ navigate }: { navigate: (s: ScreenName) => 
               <span style={{ fontSize: 'clamp(50px,13vw,84px)', fontWeight: 900, color: '#fff', letterSpacing: '-0.03em', lineHeight: 1 }}>
                 {item.label}
               </span>
-              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)', marginTop: 5, letterSpacing: '0.1em', fontWeight: 600 }}>
+              <span style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.55)', marginTop: 5, letterSpacing: '0.08em', fontWeight: 600 }}>
                 {item.sub.toUpperCase()}
               </span>
             </div>
-            <span style={{ fontSize: 20, color: 'rgba(255,255,255,0.12)', flexShrink: 0 }}>›</span>
+            <span style={{ fontSize: 20, color: 'rgba(255,255,255,0.3)', flexShrink: 0 }}>›</span>
           </button>
         ))}
       </div>
@@ -83,7 +83,7 @@ export default function HomeScreen({ navigate }: { navigate: (s: ScreenName) => 
         gap: 8,
       }}>
         <div style={{ width: 6, height: 6, borderRadius: '50%', background: A, animation: 'breathe 3s ease-in-out infinite' }} />
-        <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.22)', letterSpacing: '0.12em', fontWeight: 600 }}>{today}</span>
+        <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.1em', fontWeight: 600 }}>{today}</span>
       </div>
     </div>
   );

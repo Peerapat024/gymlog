@@ -22,7 +22,7 @@ const KG_TO_LBS = 2.20462;
 
 /* ─── Equipment badge ─────────────────────────────────────────────────────── */
 const EQUIP: Record<EquipmentType, { label: string; bg: string; text: string }> = {
-  Barbell:    { label: 'BARBELL',    bg: 'rgba(255,255,255,0.06)', text: 'rgba(255,255,255,0.45)' },
+  Barbell:    { label: 'BARBELL',    bg: 'rgba(255,255,255,0.06)', text: 'rgba(255,255,255,0.59)' },
   Dumbbell:   { label: 'DUMBBELL',   bg: 'rgba(80,160,255,0.1)',   text: 'rgba(110,180,255,0.85)' },
   Cable:      { label: 'CABLE',      bg: 'rgba(200,255,0,0.08)',   text: 'rgba(200,255,0,0.7)'    },
   Machine:    { label: 'MACHINE',    bg: 'rgba(180,110,255,0.1)',  text: 'rgba(190,130,255,0.85)' },
@@ -67,7 +67,7 @@ function InlineAddExerciseForm({ bodyPartId, onAdd, onCancel }: {
         placeholder="Exercise name..."
         style={{ width: '100%', background: '#161616', border: `0.5px solid ${B}`, borderRadius: 9, padding: '12px 14px', color: '#fff', fontSize: 14, fontWeight: 600, outline: 'none', marginBottom: 10 }} />
       {!showDetails ? (
-        <button onClick={() => setShowDetails(true)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.28)', cursor: 'pointer', fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', padding: 0, marginBottom: 12 }}>
+        <button onClick={() => setShowDetails(true)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.36)', cursor: 'pointer', fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', padding: 0, marginBottom: 12 }}>
           + ADD DETAILS (OPTIONAL)
         </button>
       ) : (
@@ -82,7 +82,7 @@ function InlineAddExerciseForm({ bodyPartId, onAdd, onCancel }: {
               const color = EQUIP[eq].text;
               return (
                 <button key={eq} onClick={() => setEquipment(active ? null : eq)}
-                  style={{ padding: '6px 12px', background: active ? EQUIP[eq].bg : 'transparent', border: `0.5px solid ${active ? 'rgba(255,255,255,0.12)' : B}`, borderRadius: 7, color: active ? color : 'rgba(255,255,255,0.28)', fontSize: 10, fontWeight: 800, cursor: 'pointer', letterSpacing: '0.06em' }}>
+                  style={{ padding: '6px 12px', background: active ? EQUIP[eq].bg : 'transparent', border: `0.5px solid ${active ? 'rgba(255,255,255,0.12)' : B}`, borderRadius: 7, color: active ? color : 'rgba(255,255,255,0.36)', fontSize: 10, fontWeight: 800, cursor: 'pointer', letterSpacing: '0.06em' }}>
                   {EQUIP_LABELS[eq]}
                 </button>
               );
@@ -91,9 +91,9 @@ function InlineAddExerciseForm({ bodyPartId, onAdd, onCancel }: {
         </div>
       )}
       <div style={{ display: 'flex', gap: 8 }}>
-        <button onClick={onCancel} style={{ padding: '11px 16px', background: 'transparent', border: `0.5px solid ${B}`, borderRadius: 9, fontSize: 11, fontWeight: 700, cursor: 'pointer', color: 'rgba(255,255,255,0.3)', letterSpacing: '0.08em' }}>CANCEL</button>
+        <button onClick={onCancel} style={{ padding: '11px 16px', background: 'transparent', border: `0.5px solid ${B}`, borderRadius: 9, fontSize: 11, fontWeight: 700, cursor: 'pointer', color: 'rgba(255,255,255,0.39)', letterSpacing: '0.08em' }}>CANCEL</button>
         <button onClick={handleAdd} disabled={!canAdd}
-          style={{ flex: 1, padding: '11px 0', background: canAdd ? A : '#111', border: 'none', borderRadius: 9, fontSize: 13, fontWeight: 800, cursor: canAdd ? 'pointer' : 'default', color: canAdd ? '#000' : 'rgba(255,255,255,0.15)' }}>
+          style={{ flex: 1, padding: '11px 0', background: canAdd ? A : '#111', border: 'none', borderRadius: 9, fontSize: 13, fontWeight: 800, cursor: canAdd ? 'pointer' : 'default', color: canAdd ? '#000' : 'rgba(255,255,255,0.20)' }}>
           ADD EXERCISE
         </button>
       </div>
@@ -113,16 +113,16 @@ function SplitCard({ split, onSelectDay, disableInteractions }: { split: Trainin
       >
         <div style={{ textAlign: 'left' }}>
           <div style={{ fontSize: 18, fontWeight: 900, color: '#fff', letterSpacing: '-0.01em', lineHeight: 1.1 }}>{split.name.toUpperCase()}</div>
-          <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.28)', letterSpacing: '0.18em', fontWeight: 700, marginTop: 4 }}>{split.tag}</div>
+          <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.36)', letterSpacing: '0.18em', fontWeight: 700, marginTop: 4 }}>{split.tag}</div>
         </div>
-        <span style={{ fontSize: 13, color: open ? A : 'rgba(255,255,255,0.25)', display: 'inline-block', transform: open ? 'rotate(90deg)' : 'none', transition: 'transform 0.22s ease, color 0.18s ease', fontWeight: 700 }}>›</span>
+        <span style={{ fontSize: 13, color: open ? A : 'rgba(255,255,255,0.33)', display: 'inline-block', transform: open ? 'rotate(90deg)' : 'none', transition: 'transform 0.22s ease, color 0.18s ease', fontWeight: 700 }}>›</span>
       </button>
 
       {/* Description + days */}
       {open && (
         <div style={{ borderTop: `0.5px solid ${B}`, animation: 'fadeIn 0.15s ease-out both' }}>
           {split.description && (
-            <p style={{ margin: 0, padding: '12px 22px 8px', fontSize: 12, color: 'rgba(255,255,255,0.35)', lineHeight: 1.5, fontWeight: 500 }}>{split.description}</p>
+            <p style={{ margin: 0, padding: '12px 22px 8px', fontSize: 12, color: 'rgba(255,255,255,0.46)', lineHeight: 1.5, fontWeight: 500 }}>{split.description}</p>
           )}
           {split.days.map((day, idx) => (
             <button
@@ -132,9 +132,9 @@ function SplitCard({ split, onSelectDay, disableInteractions }: { split: Trainin
             >
               <div style={{ textAlign: 'left', flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 13, fontWeight: 800, color: '#fff', letterSpacing: '0.04em', marginBottom: 3 }}>{day.name.toUpperCase()}</div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{day.muscles}</div>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.39)', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{day.muscles}</div>
               </div>
-              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.2)', fontWeight: 700, flexShrink: 0 }}>›</span>
+              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.26)', fontWeight: 700, flexShrink: 0 }}>›</span>
             </button>
           ))}
         </div>
@@ -174,7 +174,7 @@ function WorkoutStartScreen({ sessionSets, onFresh, onTemplate, onFinish }: {
   return (
     <div style={{ minHeight: '100svh', display: 'flex', flexDirection: 'column', background: BG, animation: 'fadeIn 0.2s ease-out both' }}>
       <div style={{ padding: '52px 28px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <button onClick={onFinish} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', fontSize: 12, letterSpacing: '0.1em', fontWeight: 600, padding: 0 }}>
+        <button onClick={onFinish} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.52)', cursor: 'pointer', fontSize: 12, letterSpacing: '0.1em', fontWeight: 600, padding: 0 }}>
           {inSession ? '← FINISH SESSION' : '← HOME'}
         </button>
         {inSession && <span style={{ fontSize: 10, color: M, letterSpacing: '0.12em' }}>{sessionSets.length} SETS</span>}
@@ -189,7 +189,7 @@ function WorkoutStartScreen({ sessionSets, onFresh, onTemplate, onFinish }: {
         <button onClick={() => !disableInteractions && onFresh()} style={{ padding: '26px 22px', background: A, border: 'none', borderRadius: 14, color: '#000', cursor: disableInteractions ? 'default' : 'pointer', textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center', pointerEvents: disableInteractions ? 'none' : 'auto' }}>
           <div>
             <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-0.01em' }}>{inSession ? 'SWITCH MUSCLE GROUP' : 'START FRESH'}</div>
-            <div style={{ fontSize: 10, color: 'rgba(0,0,0,0.45)', marginTop: 5, letterSpacing: '0.12em', fontWeight: 700 }}>PICK ANY MUSCLE GROUP</div>
+            <div style={{ fontSize: 10, color: 'rgba(0,0,0,0.59)', marginTop: 5, letterSpacing: '0.12em', fontWeight: 700 }}>PICK ANY MUSCLE GROUP</div>
           </div>
           <span style={{ fontSize: 20, fontWeight: 700 }}>→</span>
         </button>
@@ -198,7 +198,7 @@ function WorkoutStartScreen({ sessionSets, onFresh, onTemplate, onFinish }: {
         {userTemplates.length > 0 && (<>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 4px 2px' }}>
             <div style={{ flex: 1, height: '0.5px', background: B }} />
-            <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.2em', fontWeight: 700 }}>MY TEMPLATES</span>
+            <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.26)', letterSpacing: '0.2em', fontWeight: 700 }}>MY TEMPLATES</span>
             <div style={{ flex: 1, height: '0.5px', background: B }} />
           </div>
           {userTemplates.map(tpl => (
@@ -206,9 +206,9 @@ function WorkoutStartScreen({ sessionSets, onFresh, onTemplate, onFinish }: {
               <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: '-0.01em', marginBottom: 8 }}>{tpl.name.toUpperCase()}</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
                 {tpl.exercises.slice(0, 5).map(e => (
-                  <span key={e.name} style={{ fontSize: 9, color: 'rgba(255,255,255,0.35)', background: '#1A1A1A', padding: '3px 8px', borderRadius: 5, fontWeight: 700, letterSpacing: '0.04em' }}>{e.name.toUpperCase()}</span>
+                  <span key={e.name} style={{ fontSize: 9, color: 'rgba(255,255,255,0.46)', background: '#1A1A1A', padding: '3px 8px', borderRadius: 5, fontWeight: 700, letterSpacing: '0.04em' }}>{e.name.toUpperCase()}</span>
                 ))}
-                {tpl.exercises.length > 5 && <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.25)', fontWeight: 700 }}>+{tpl.exercises.length - 5}</span>}
+                {tpl.exercises.length > 5 && <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.33)', fontWeight: 700 }}>+{tpl.exercises.length - 5}</span>}
               </div>
             </button>
           ))}
@@ -217,7 +217,7 @@ function WorkoutStartScreen({ sessionSets, onFresh, onTemplate, onFinish }: {
         {/* Splits */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 4px 2px' }}>
           <div style={{ flex: 1, height: '0.5px', background: B }} />
-          <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.2em', fontWeight: 700 }}>TRAINING SPLITS</span>
+          <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.26)', letterSpacing: '0.2em', fontWeight: 700 }}>TRAINING SPLITS</span>
           <div style={{ flex: 1, height: '0.5px', background: B }} />
         </div>
 
@@ -269,7 +269,7 @@ function BodyPartScreen({ onSelect, onBack, onFinish, sessionSets }: {
             >
               <span style={{ fontSize: 'clamp(22px,5.5vw,30px)', fontWeight: 800, letterSpacing: '-0.01em' }}>{bp.label}</span>
               {bp.children && (
-                <span style={{ fontSize: 14, color: armsOpen ? A : 'rgba(255,255,255,0.3)', display: 'inline-block', transform: armsOpen ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s, color 0.2s' }}>→</span>
+                <span style={{ fontSize: 14, color: armsOpen ? A : 'rgba(255,255,255,0.39)', display: 'inline-block', transform: armsOpen ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s, color 0.2s' }}>→</span>
               )}
             </button>
             {bp.children && armsOpen && (
@@ -285,7 +285,7 @@ function BodyPartScreen({ onSelect, onBack, onFinish, sessionSets }: {
           </div>
         ))}
         {total > 0 && (
-          <button onClick={onFinish} style={{ marginTop: 4, width: '100%', padding: '18px', background: 'transparent', border: `0.5px solid ${B}`, borderRadius: 12, color: 'rgba(255,255,255,0.4)', cursor: 'pointer', fontSize: 12, fontWeight: 700, letterSpacing: '0.12em' }}>
+          <button onClick={onFinish} style={{ marginTop: 4, width: '100%', padding: '18px', background: 'transparent', border: `0.5px solid ${B}`, borderRadius: 12, color: 'rgba(255,255,255,0.52)', cursor: 'pointer', fontSize: 12, fontWeight: 700, letterSpacing: '0.12em' }}>
             FINISH SESSION →
           </button>
         )}
@@ -311,7 +311,7 @@ function ExerciseScreen({ bodyPartId, onSelect, onBack, onSwitchMuscle, restEnds
     <div style={{ minHeight: '100svh', display: 'flex', flexDirection: 'column', background: BG, animation: 'fadeIn 0.2s ease-out both' }}>
       <div style={{ padding: '52px 28px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Back onBack={onBack} />
-        <button onClick={() => { haptic.light(); onSwitchMuscle(); }} style={{ background: 'none', border: `0.5px solid rgba(255,255,255,0.15)`, borderRadius: 7, padding: '6px 12px', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', fontSize: 10, letterSpacing: '0.12em', fontWeight: 700 }}>
+        <button onClick={() => { haptic.light(); onSwitchMuscle(); }} style={{ background: 'none', border: `0.5px solid rgba(255,255,255,0.15)`, borderRadius: 7, padding: '6px 12px', color: 'rgba(255,255,255,0.65)', cursor: 'pointer', fontSize: 10, letterSpacing: '0.12em', fontWeight: 700 }}>
           SWITCH MUSCLE
         </button>
       </div>
@@ -326,7 +326,7 @@ function ExerciseScreen({ bodyPartId, onSelect, onBack, onSwitchMuscle, restEnds
       </div>
       <div style={{ flex: 1, padding: '4px 20px', paddingBottom: 'max(140px,calc(env(safe-area-inset-bottom)+110px))', display: 'flex', flexDirection: 'column', gap: 5 }}>
         {exercises.length === 0 && (
-          <div style={{ padding: '40px 0', textAlign: 'center', fontSize: 11, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.14em' }}>NO MATCHES</div>
+          <div style={{ padding: '40px 0', textAlign: 'center', fontSize: 11, color: 'rgba(255,255,255,0.26)', letterSpacing: '0.14em' }}>NO MATCHES</div>
         )}
         {exercises.map(ex => {
           const info = getExerciseInfo(ex);
@@ -349,7 +349,7 @@ function ExerciseScreen({ bodyPartId, onSelect, onBack, onSwitchMuscle, restEnds
                 </div>
                 {/* Focus area */}
                 {info && (
-                  <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.35)', marginBottom: lastTopW || pr > 0 ? 8 : 0, lineHeight: 1.4 }}>
+                  <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.46)', marginBottom: lastTopW || pr > 0 ? 8 : 0, lineHeight: 1.4 }}>
                     {info.focus}
                   </div>
                 )}
@@ -362,19 +362,19 @@ function ExerciseScreen({ bodyPartId, onSelect, onBack, onSwitchMuscle, restEnds
                   )}
                   {lastTopW && (
                     <>
-                      <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)', fontWeight: 600 }}>{lastDate}</span>
-                      <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.38)', fontWeight: 700 }}>{lastTopW}kg</span>
-                      <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.22)' }}>{lastSets}s</span>
+                      <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.36)', fontWeight: 600 }}>{lastDate}</span>
+                      <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.49)', fontWeight: 700 }}>{lastTopW}kg</span>
+                      <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.29)' }}>{lastSets}s</span>
                     </>
                   )}
                 </div>
               </div>
-              <span style={{ fontSize: 18, color: 'rgba(255,255,255,0.18)', flexShrink: 0, marginTop: 3 }}>›</span>
+              <span style={{ fontSize: 18, color: 'rgba(255,255,255,0.24)', flexShrink: 0, marginTop: 3 }}>›</span>
             </button>
           );
         })}
         {!adding && (
-          <button onClick={() => setAdding(true)} style={{ padding: '15px 18px', background: 'transparent', border: `0.5px solid ${B}`, borderRadius: 11, color: 'rgba(255,255,255,0.35)', cursor: 'pointer', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', marginTop: 4 }}>
+          <button onClick={() => setAdding(true)} style={{ padding: '15px 18px', background: 'transparent', border: `0.5px solid ${B}`, borderRadius: 11, color: 'rgba(255,255,255,0.46)', cursor: 'pointer', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', marginTop: 4 }}>
             + ADD EXERCISE TO {bodyPartId.toUpperCase()}
           </button>
         )}
